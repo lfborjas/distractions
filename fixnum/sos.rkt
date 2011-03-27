@@ -13,61 +13,39 @@
 ;and the book "metaprogramming ruby":
 ;http://pragprog.com/titles/ppmetr/metaprogramming-ruby
 
-(provide define-class)
+(provide define-class extend)
 
+;describes an object
 (struct s-object  
-    (klass [instance-vars #:auto])
+    (klass instance-vars)
     #:mutable
-    #:transparent
-    #:auto-value (make-hash))
+    #:transparent)
+    
 
+;describes a class, which is an object
 (struct s-class 
-    (klass instance-vars methods method-vector [superclass #:auto])
+    (superclass klass instance-vars methods)
     #:mutable
-    #:transparent
-    #:auto-value object)
+    #:transparent)
+
+
+(define-macro extend-class
+    (lambda (superclass . methods)
+        `(create-class-proc
+            ,superclass
+            standard-class
+            (make-hash ,methods))))
 
 (define-macro define-class
-    (lambda (superclass instance-vars . methods)
-        `(create-class-proc 
-            ,superclass
-            ;TODO: shouldn't this be a class, not a struct?
-            standard-class ;the klass: all classes are standard-classes
-            (list   ,@(map (lambda (ivar) `,ivar) instance-vars))
-            (list   ,@(map (lambda (method) `,(car method)) methods))
-            (vector ,@(map (lambda (method) `,(cadr method)) methods)))))
+    (lambda methods
+        `(extend-class
+            object
+            ,@methods)))
 
-(define object
-    (define-class
-        '() ; the superclass for object
-        '() ; the instance vars for an object
-         ;methods?
-         ))
-
-(define standard-class
-    (define-class
-        object
-        '()
-        '()
-        ;methods?
-        ))
-
-
-(define make-instance
-    (lambda (class . ivar-pairs)
-        (let* ((ivar-list (s-class-instance-vars class))
-               ;create a new instance of object
-               (instance (s-object class)))
-               ;remove any pair that's not part of the class list
-               ;and then build the hash:
-               (set-object-instance-vars!
-                  instance 
-                  (make-hash (filter (lambda (p) (member (car p) ivar-list)) ivar-pairs)))
-               instance)))
 
 (define create-class-proc
     (lambda (superclass klass instance-vars methods method-vector)
-        (standard-class 
+        (s-class 
             superclass
             klass
             (let ((superclass-ivars 
@@ -85,7 +63,6 @@
           (if (memv a d) (delete-duplicates d)
               (cons a (delete-duplicates d)))))))
 
-
 (define send  
     (lambda (method instance . args)
         (let ((proc 
@@ -100,3 +77,26 @@
                                 (loop (s-class-superclass class)))))))))
               (apply proc instance args))))
 
+(define make-instance
+    (lambda (class . ivar-pairs)
+        (let* ((ivar-list (s-class-instance-vars class))
+               ;create a new instance of object
+               (instance (s-object class)))
+               ;remove any pair that's not part of the class list
+               ;and then build the hash:
+               (set-object-instance-vars!
+                  instance 
+                  (make-hash (filter (lambda (p) (member (car p) ivar-list)) ivar-pairs)))
+               instance)))
+
+(define object
+    (extend-class
+         'nil ; the superclass for object
+         (method-missing (lambda (m . args) 
+                            (error (string-append "Missing method: " (symbol->string m)))))))
+
+(define standard-class
+    (extend-class
+        object
+        ;methods?
+        ))
