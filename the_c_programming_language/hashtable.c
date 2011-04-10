@@ -73,11 +73,23 @@ char *name;
     return np;
 }
 
+void print_table(from)
+char *from;
+{
+    struct nlist *p;
+    for(p = hashtab[hash(from)]; p != NULL; p = p->next){
+        printf("%s: %s\n", p->name, p->def);
+    }
+}
 
 int main(){
     install("hello", "world");
     printf("%s", lookup("hello")->def);
-    undef("hello");
-    printf("%d", lookup("hello")==NULL);
+//    undef("hello");
+//    printf("%d", lookup("hello")==NULL);
+//    install("hello", "world");
+    install("bye", "world");
+    printf("The table\n========");
+    print_table("bye");
     return 0;
 }
