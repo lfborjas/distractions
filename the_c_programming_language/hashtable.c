@@ -60,8 +60,24 @@ char *name, *def;
     return np;
 }
 
+struct nlist *undef(name)
+/*Remove a name and its definition from the table*/
+char *name;
+{
+    struct nlist *np;
+    if( (np = lookup(name)) != NULL ){
+        free((void *) np->name);
+        free((void *) np->def);
+    }
+
+    return np;
+}
+
+
 int main(){
     install("hello", "world");
     printf("%s", lookup("hello")->def);
+    undef("hello");
+    printf("%d", lookup("hello")==NULL);
     return 0;
 }
