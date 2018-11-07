@@ -2,7 +2,7 @@
 ;; utility functions from Graham's On Lisp
 
 
-(defun mkstr (&rest args)
+(defun mkstr. (&rest args)
   (with-output-to-string (s)
     (dolist (a args) (princ a s))))
 
@@ -21,7 +21,7 @@
                     (cons source acc))))))
     (if source (rec source nil) nil)))
 
-(defun flatten (x)
+(defun flatten. (x)
   (labels ((rec (x acc)
              (cond ((null x) acc)
                    ((atom x) (cons x acc))
