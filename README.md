@@ -1,6 +1,6 @@
 # Distractions
 
-Working through examples found in various books or online resources.
+Working through examples found in various books or online resources. Mostly Common Lisp and Scheme. Maybe one day I'll branch out and learn Haskel. For something slightly close to reality, see my [clojure-playground](https://github.com/lfborjas/clojure-playground). For things actually close to reality, I'm afraid all my battle-tested production code that makes money is in private repos!
 
 # Up and running (a note to self)
 
@@ -74,7 +74,9 @@ More about Slime contrib: https://www.common-lisp.net/project/slime/doc/html/Loa
 
 With the contribs in place, one can just launch slime with `M-x slime` and the better REPL (i.e. not the default SBCL `*` prompt with no autocompletion) should show up.
 
+My current Emacs setup for  looks like this:
 
+![image](https://user-images.githubusercontent.com/82133/48101662-d2857980-e1f5-11e8-97a7-dc8e3162e0e4.png)
 
 
 # Distractions thus far
