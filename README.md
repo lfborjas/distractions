@@ -4,6 +4,24 @@ Working through examples found in various books or online resources.
 
 # Up and running (a note to self)
 
+## With Racket
+
+Download Racket from the official website: https://racket-lang.org
+
+It'll prompt you to drag the Racket folder to the applications folder. Though in my case, it was in some weird non-standard `Applications` (in `/Volumes/Macintosh\ SD/Applications`?). DrRacket will be openable as an application, but you'll have to symlink the racket binary yourself if you want it. I did the following:
+
+	ln -s /Volumes/Macintosh\ HD/Applications/Racket\ v7.1/bin/racket /usr/local/bin/racket
+
+You'll notice a few other apps (with corresponding bins): 
+
+	ls /Volumes/Macintosh\ HD/Applications/Racket\ v7.1/
+	DrRacket.app/             Racket Documentation.app/ collects/                 include/                  share/                    
+	PLT Games.app/            Slideshow.app/            doc/                      lib/                      
+	README.txt                bin/                      etc/                      man
+
+For example, `PLT Games` comes with a cute old-skool looking set of classic games like minesweeper!
+
+
 ## With Common Lisp
 
 I found this to be the best resource to get a working Common Lisp installed: https://exercism.io/tracks/common-lisp/installation
