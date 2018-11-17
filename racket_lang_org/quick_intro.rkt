@@ -11,5 +11,6 @@
         [p21 (hc-append p2 p1)])
     (vc-append p12 p21)))
 
+;; C-c C-d, as expected, brings up the docs... in html!! (try it with `colorize`)
 (checker (colorize (square 10) "red")
          (colorize (square 10) "black"))
