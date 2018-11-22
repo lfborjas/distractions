@@ -111,7 +111,7 @@
 
 (struct player (health agility strength) #:mutable #:transparent)
 
-(struct orc-world (player lom attack# target) #:mutable)
+(struct orc-world (player lom attack# target) #:mutable #:transparent)
 
 (define (start-game)
   (big-bang (initialize-orc-world)
