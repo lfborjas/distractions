@@ -51,7 +51,7 @@
 ;; Constants
 
 ; initalization constants
-(define PLAYER# 2)
+(define PLAYER# 3)
 (define DICE# 4)
 (define BOARD 5)
 (define GRID (* BOARD BOARD))
