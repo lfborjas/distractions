@@ -48,6 +48,9 @@
   (set! BOARD n)
   (set! GRID (* n n)))
 
+(define (set-players n)
+  (set! PLAYER# n))
+
 ;; Constants
 
 ; initalization constants
@@ -89,7 +92,7 @@
 (define INSTRUCT 
   "← and → to move among territories, <enter> to mark, <d> to unmark, and <p> to pass.")
 (define AI-TURN "It's the Mighty AI's turn")
-(define YOUR-TURN "It's your turn")
+(define YOUR-TURN "It's player ~s's turn")
 (define INFO-X-OFFSET 100)
 (define INFO-Y-OFFSET 50)
 
@@ -204,7 +207,8 @@
   (place-image txt (- WIDTH INFO-X-OFFSET) INFO-Y-OFFSET s))
 
 (define (whose-turn player)
-  (if (= player AI) AI-TURN YOUR-TURN))
+  (if (= player AI) AI-TURN
+      (format YOUR-TURN (add1 player))))
 
 (define (add-board-to-scene w s)
   (define board  (dice-world-board w))
@@ -484,8 +488,12 @@
   ;; indulging in my own neologisms here:
   (define-values [best-score w] (winners board))
   (if (cons? (rest w))
-      "It's a tie!"
-      "You won!"))
+      (format "It's a tie for players ~a"
+              (string-join
+               (map (compose number->string add1) (rest w))
+               ","
+               #:before-last " and "))
+      (format "Player ~s won!" (add1 (first w)))))
 
 ;; notice the casual use of multiple return values here
 (define (winners board)
@@ -536,4 +544,5 @@
 
 ;; To play, uncomment these or run from the REPL
 #(set-grid 4)
+#(set-players 2) ; the AI is always the second player
 #(roll-the-dice)
