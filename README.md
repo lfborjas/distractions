@@ -1,6 +1,6 @@
 # Distractions
 
-Working through examples found in various books or online resources. Mostly Common Lisp and Scheme. Maybe one day I'll branch out and learn Haskel. For something slightly close to reality, see my [clojure-playground](https://github.com/lfborjas/clojure-playground). For things actually close to reality, I'm afraid all my battle-tested production code that makes money is in private repos!
+Working through examples found in various books or online resources. Mostly functional languages, with a heavy bias towards lisps. For something slightly close to reality, see my [clojure-playground](https://github.com/lfborjas/clojure-playground). For things actually close to reality, I'm afraid all my battle-tested production code that makes money is in private repos!
 
 # Up and running (a note to self)
 
@@ -83,9 +83,17 @@ My current Emacs setup for  looks like this:
 
 ## Land of Lisp
 
-A very entertaining book that I began reading in 2011 and picked back up in 2018: http://landoflisp.com
+A very entertaining book that I began reading in 2011 and picked back up in 2018: http://landoflisp.com. Revels in the oddity of Common Lisp and sets out to write a few text-based (and one browser-based) games from scratch, exploring most of the capabilities of the language.
 
 ## Let Over Lambda
 
 Very opinionated and deeply interesting exploration of Common Lisp macros, interested in macro design for my Clojure explorations. A good chunk of the book is available online, at: https://letoverlambda.com
+
+## Realm of Racket
+
+A gentle introduction to Racket, using graphics libraries bundled with the language and useful for following another introductory book, [How to Design Programs, 2nd Edition](https://htdp.org/2018-01-06/) to build a few games to illustrate concepts such as recursion, structs (mutable and immutable), higher order functions and the `for` family of macros, lazy evaluation, decision tree exploration and pruning and even networking! Not as ambitious or intense as Land of Lisp, but definitely in the same spirit and conducive to picking up some idiomatic Racket practices laid down by one of the creators of the language.
+
+## Haskell School of Music
+
+Finally exploring the other side of the functional house lured by my love of music. This book explores the Euterpea haskell library as well as the language itself. Came out recently (August 2018): http://euterpea.com/haskell-school-of-music/ (the full text of an earlier, incomplete (due to the untimely death of the original author), version is available at: http://haskell.cs.yale.edu/wp-content/uploads/2015/03/HSoM.pdf)
 
