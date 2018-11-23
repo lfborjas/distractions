@@ -12,5 +12,10 @@ When executed, you get a turn-based game where you get a random number of attack
 
 ![image](https://user-images.githubusercontent.com/82133/48918592-81af8b00-ee5b-11e8-81c1-a7959a1ae6ae.png)
 
+## Dice of Doom
+
+Strategy game for two players, where you can choose to attack a neighboring territory if you have more dice in your attacking territory than your opponent has in the target. For each attack, you navigate with the arrow keys to a source territory, hit enter to mark it, then navigate to an opponent territory and hit enter to mark it; if the attack is possible, it'll be effected and you pay with sending one of your dice to the dice pool. If there's no more attacks to make, you must pass and the computer will replenish all your territories if there's dice to spare. 
+
+![image](https://user-images.githubusercontent.com/82133/48929216-881e2100-eeb4-11e8-8f8c-6416380f8b09.png)
 
 
