@@ -32,3 +32,13 @@ configuration should be easy:
 
 I run my stuff from the REPL from within Emacs. `C-c C-k` for entire files, `C-x
 C-e` for individual sexps.
+
+## Games
+
+### Dice of Doom, v1
+
+An example of DoD, v1, Human vs. Human; using Emacs + SLIME:
+
+![image](https://user-images.githubusercontent.com/82133/48965920-1c5fb500-ef95-11e8-99fd-84651bbd6909.png)
+
+
