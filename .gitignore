@@ -7,3 +7,6 @@
 *#*#
 *.rbc
 *.out
+# compiled lisp files:
+*.fas
+*.lib
