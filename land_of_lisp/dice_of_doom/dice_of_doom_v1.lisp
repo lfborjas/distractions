@@ -198,6 +198,55 @@
         (format t "The winner is ~a" (player-letter (car w))))))
 
 
+;;; AI strategies
+
+;; Rates positions given the current state of the tree
+;; for the current player (the computer)
+;;
+;; If there's any possible moves and it's a move-state
+;; for the computer, get the vertex that has the most value
+;; if not, the one with the least (minimax: "what's bad for my enemy
+;; is good for me").
+;; If there's no moves (end-state), rate between 0 (player's not a winner)
+;; and 1 (player's the sole winner), with ties inbetween (if there's multiple
+;; players)
+(defun rate-position (tree player)
+  (let ((moves (caddr tree)))
+    (if moves
+        (apply (if (eq (car tree) player)
+                   #'max
+                   #'min)
+               (get-ratings tree player))
+        (let ((w (winners (cadr tree))))
+          (if (member player w)
+              (/ 1 (length w))
+              0)))))
+
+;; Helper fn: get all the ratings for each following move
+(defun get-ratings (tree player)
+  (mapcar (lambda (move)
+                 (rate-position (cadr move) player))
+          (caddr tree)))
+
+;;; AI interaction
+
+;; The computer simply picks the move with the highest rating
+(defun handle-computer (tree)
+  (let ((ratings (get-ratings tree (car tree))))
+    (cadr (nth (position (apply #'max ratings) ratings)
+               (caddr tree)))))
+
+;; Main UI handler:
+;; If there's no moves, announce the winner
+;; If it's the first player's turn, we know by convention it's the human
+;; else, it's the computer's turn (notice that this assumes only those two players).
+(defun play-vs-computer (tree)
+  (print-info tree)
+  (cond ((null (caddr tree)) (announce-winner (cadr tree)))
+        ((zerop (car tree))  (play-vs-computer (handle-human tree)))
+        (t                   (play-vs-computer (handle-computer tree)))))
+
+
 
 
 ;; Example Human v Human game (notice that sometimes it generates games with no
@@ -251,5 +300,47 @@
 ;; current player = b
 ;;   a-1 a-1 
 ;;  a-1 b-1 
+;; The winner is a
+;; NIL
+
+;; Example Human vs Computer game:
+
+;; CL-USER> (play-vs-computer (game-tree (gen-board) 0 0 t))
+;; current player = a
+;;   a-2 b-3 
+;;  b-1 a-3 
+;; choose your move:
+;; 1. 0 -> 2
+;; 2. 3 -> 2
+;; 1
+;; current player = a
+;;   a-1 b-3 
+;;  a-1 a-3 
+;; choose your move:
+;; 1. end turn
+;; 1
+;; current player = b
+;;   a-1 b-3 
+;;  a-1 a-3 
+;; current player = b
+;;   b-2 b-1 
+;;  a-1 a-3 
+;; current player = a
+;;   b-2 b-1 
+;;  a-1 a-3 
+;; choose your move:
+;; 1. 3 -> 1
+;; 2. 3 -> 0
+;; 2
+;; current player = a
+;;   a-2 b-1 
+;;  a-1 a-1 
+;; choose your move:
+;; 1. end turn
+;; 2. 0 -> 1
+;; 1
+;; current player = b
+;;   a-3 b-1 
+;;  a-1 a-1 
 ;; The winner is a
 ;; NIL
