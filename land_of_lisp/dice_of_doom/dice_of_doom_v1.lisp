@@ -2,7 +2,7 @@
 
 (defparameter *num-players* 2)
 (defparameter *max-dice* 3)
-(defparameter *board-size* 2)
+(defparameter *board-size* 3) ;; without memoization and lazy eval, 3 is too much.
 (defparameter *board-hexnum* (* *board-size* *board-size*))
 
 ;; be able to represent the board as an array, not a list,
@@ -136,17 +136,42 @@
 ;; owned by player 0:
 ;; CL-USER> (add-new-dice #((0 1) (1 3) (0 2) (1 1)) 0 2)
 ;; #((0 2) (1 3) (0 3) (1 1))
+
+;; This is the non-TCO version of add-new-dice: notice that it recurs
+;; on `f` in a non-tail-call (needs to keep the stack to be able to do the cons
+;; calls). 
+;; (defun add-new-dice (board player spare-dice)
+;;   (labels ((f (lst n)
+;;              (cond ((null lst) nil)
+;;                    ((zerop n)  lst)
+;;                    (t (let ((cur-player (caar lst))
+;;                             (cur-dice   (cadar lst)))
+;;                         (if (and (eq cur-player player) (< cur-dice *max-dice*))
+;;                             (cons (list cur-player (1+ cur-dice))
+;;                                   (f (cdr lst) (1- n)))
+;;                             (cons (car lst) (f (cdr lst) n))))))))
+;;     (board-array (f (coerce board 'list) spare-dice))))
+
+;; this is the tail-call optimizable version of add-new-dice:
+;; it uses the "accumulator" technique to be able to discard the stack
 (defun add-new-dice (board player spare-dice)
-  (labels ((f (lst n)
-             (cond ((null lst) nil)
-                   ((zerop n)  lst)
+  (labels ((f (lst n acc)
+             (cond ((zerop n)  (append (reverse acc) lst))
+                   ((null lst) (reverse acc))
                    (t (let ((cur-player (caar lst))
                             (cur-dice   (cadar lst)))
-                        (if (and (eq cur-player player) (< cur-dice *max-dice*))
-                            (cons (list cur-player (1+ cur-dice))
-                                  (f (cdr lst) (1- n)))
-                            (cons (car lst) (f (cdr lst) n))))))))
-    (board-array (f (coerce board 'list) spare-dice))))
+                        (if (and (eq cur-player player)
+                                 (< cur-dice *max-dice*))
+                            (f (cdr lst)
+                               (1- n)
+                               (cons (list cur-player (1+ cur-dice)) acc))
+                            (f (cdr lst) n (cons (car lst) acc))))))))
+    (board-array (f (coerce board 'list) spare-dice ()))))
+
+;; To ensure TCO in clisp, one must compile the fn:
+;; (compile 'add-new-dice)
+;; CL-USER> (compile 'add-new-dice)
+;; ADD-NEW-DICE
 
 ;;; At this point, we've defined all the helper fns required by game-tree.
 
@@ -248,6 +273,45 @@
 
 
 
+;;; OPTIMIZATIONS
+
+;; Notice how we use a let-over-lambda closure to
+;; memoize using a hash-table, and symbol-function
+;; to retrieve our previous implementation of the fn;
+;; not only is this dynamic, it feels like a "decorator".
+;; Also, notice how `setf` can take a getter and use it
+;; to set too; I think that's a pretty cool CL idiom.
+(let ((old-neighbors (symbol-function 'neighbors))
+      (previous      (make-hash-table)))
+  (defun neighbors (pos)
+    (or (gethash pos previous)
+        (setf (gethash pos previous)
+              (funcall old-neighbors pos)))))
+
+;; Notice how we use a different equality test (default is `eql`)
+;; to make sure the game tree array is deep-compared before
+;; deciding it's in the hash table. Also, using &rest
+;; is a neat trick to not have to type out all the original parameters,
+;; since we don't really need them in this context.
+(let ((old-game-tree (symbol-function 'game-tree))
+      (previous (make-hash-table :test #'equalp)))
+  (defun game-tree (&rest rest)
+    (or (gethash rest previous)
+        (setf (gethash rest previous)
+              (apply old-game-tree rest)))))
+
+;; Notice how we have embedded hash tables, for trees and players,
+;; to not have to apply something slow like `equal` to the
+;; potentially large `tree`
+(let ((old-rate-position (symbol-function 'rate-position))
+      (previous (make-hash-table)))
+  (defun rate-position (tree player)
+    (let ((tab (gethash player previous)))
+      (unless tab
+        (setf tab (setf (gethash player previous) (make-hash-table))))
+      (or (gethash tree tab)
+          (setf (gethash tree tab)
+                (funcall old-rate-position tree player))))))
 
 ;; Example Human v Human game (notice that sometimes it generates games with no
 ;; possible moves and just announces a winner instantly:
