@@ -313,6 +313,11 @@
           (setf (gethash tree tab)
                 (funcall old-rate-position tree player))))))
 
+;; After the optimizations, you'll notice that the computer takes a few seconds
+;; computing the initial tree and its initial turn; afterwards, it's pretty
+;; damn fast. This is on account of the memoizations and the TCO.
+;; When we introduce lazy evaluation later on, we'll also see less start-up lag.
+
 ;; Example Human v Human game (notice that sometimes it generates games with no
 ;; possible moves and just announces a winner instantly:
 
