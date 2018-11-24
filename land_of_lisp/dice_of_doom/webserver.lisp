@@ -93,6 +93,24 @@
                    (funcall request-handler path header params))))
       (socket-server-close socket))))
 
+;; ERRATA: added this function to create a more modern-browser-friendly
+;; response. The book simply returned a string of html, but
+;; modern browsers, firefox included (Firefox was the one used in the book)
+;; don't play with those spartan responses anymore: a status line
+;; and headers are now mandatory
+(defun build-html-response (html)
+  ;; ~% will always insert a newline, which matters because
+  ;; there's a mandatory newline between headers and body.
+  ;; notice how ~{ ~} will print everything in a list using
+  ;; the enclosed format (hence my crazy quasiquoting ways).
+  ;; Also notice how I'm using `format t` to print to stdout
+  ;; which in the dynamic context of the caller is the socket stream.
+  (format t "~{~a~%~}"
+          `("HTTP/1.1 200 OK"
+            "Content-Type: text/html"
+            ""
+            ,html)))
+
 ;; Little test handler:
 ;; Notice how the trick of only redefining *standard-output* allows us to easily
 ;; test in isolation in the REPL:
@@ -109,9 +127,10 @@
   (if (equal path "greeting")
       (let ((name (assoc 'name params)))
         (if (not name)
-            ;; notice how we're just using `princ` here because in the dynamic
-            ;; context of the caller, *standard-output* has been redefined
-            ;; to be the response stream!
-            (princ "<html><form>What's your name? <input name='name'/></form></html>")
-            (format t "<html>Nice to meet you, ~a!</html>" (cdr name))))
+            (build-html-response
+             "<html><form>What's your name?<input name='name'/></form></html>")
+            (build-html-response
+             ;; use format nil to return a string, build-html-response already
+             ;; prints it to stdout
+             (format nil "<html>Nice to meet you, ~a!</html>" (cdr name)))))
       (princ "Sorry, I don't know that page.")))
