@@ -73,4 +73,80 @@
       (play-vs-human (handle-human tree))
       (announce-winner (cadr tree))))
 
+;; After these improvements, there's no noticeable delay when starting up the game
+;; or choosing a move, due to the entire game tree never being fully traversed!
+
+;;; AI IMPROVEMENTS
+
+;; prune the AI's tree: only explore a specific depth of the tree
+(defun limit-tree-depth (tree depth)
+  (list (car tree)
+        (cadr tree)
+        (if (zerop depth)
+            (lazy-nil)
+            (lazy-mapcar (lambda (move)
+                           (list (car move)
+                                 (limit-tree-depth (cadr move)
+                                                   (1- depth))))
+                         (caddr tree)))))
+
+;; Now the AI will only look 4 levels of the tree ahead, which means
+;; it won't choose the _absolutely_ best possible outcome, but something
+;; that looks good four moves from now. The cost of performance
+;; is the AI no longer playing perfect games.
+(defparameter *ai-level* 4)
+(defun handle-computer (tree)
+  (let ((ratings (get-ratings (limit-tree-depth tree *ai-level*)
+                              (car tree))))
+    (cadr (lazy-nth (position (apply #'max ratings) ratings)
+                    (caddr tree)))))
+
+(defun play-vs-computer (tree)
+  (print-info tree)
+  (cond ((lazy-null (caddr tree)) (announce-winner (cadr tree)))
+        ((zerop (car tree)) (play-vs-computer (handle-human tree)))
+        (t (play-vs-computer (handle-computer tree)))))
+
+;;; HEURISTICS:
+;;; Since the AI can no longer see all the way into the leaves of the game tree
+;;; we need to apply some approximations: in this case, it's more valuable to
+;;; protect threatened territories, so we encode that with `score-board`
+
+(defun score-board (board player)
+  (loop for hex across board
+        for pos from 0
+        sum (if (eq (car hex) player)
+                (if (threatened pos board)
+                    1
+                    2)
+                -1)))
+
+(defun threatened (pos board)
+  (let* ((hex    (aref board pos))
+         (player (car hex))
+         (dice   (cadr hex)))
+    (loop for n in (neighbors pos)
+          do (let* ((nhex    (aref board n))
+                    (nplayer (car  nhex))
+                    (ndice   (cadr nhex)))
+               (when (and (not (eq player nplayer)) (> ndice dice))
+                 ;; return prematurely if we've found a threatening
+                 ;; neighbor: no need to explore further
+                 (return t))))))
+
+;;; redefine get ratings and rate position to use lazy eval and heuristics:
+
+(defun get-ratings (tree player)
+  (take-all (lazy-mapcar (lambda (move)
+                           (rate-position (cadr move) player))
+                         (caddr tree))))
+
+(defun rate-position (tree player)
+  (let ((moves (caddr tree)))
+    (if (not (lazy-null moves))
+        (apply (if (eq (car tree) player)
+                   #'max
+                   #'min)
+               (get-ratings tree player))
+        (score-board (cadr tree) player))))
 
