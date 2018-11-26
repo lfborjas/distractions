@@ -5,7 +5,7 @@ examples, a Lisp neophyte, fascinated and frustrated by all the parens (I was
 using a barebones installation of vim, no REPL integration, nothing of the
 life-changing benevolence of Emacs's Paredit, rainbow delimiters and SLIME).
 
-Picked it back up in 2018 as a study into the cross-pollination in the Lisp
+Picked it back up in 2018 (now a print copy) as a study into the cross-pollination in the Lisp
 world while ramping up my use of Clojure. There's many good things in this
 little tome, though I speed-read through the first 13 chapters to get to the
 good stuff: the scrappy, crazy little web server, svg renderer and game engine
