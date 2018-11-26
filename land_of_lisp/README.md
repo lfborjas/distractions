@@ -51,41 +51,10 @@ Playing against a computer using the makeshift webserver from Chapter 13:
 
 ![image](https://user-images.githubusercontent.com/82133/48995653-d6caf580-f116-11e8-871a-110ff54666ad.png)
 
-For this, I wrote `run.lisp` and compiled it for ultimate optimization (with `clisp -c run.lisp`). One can run the game from the command line, with `clisp run.fas`:
+For this, I wrote `run.lisp`. You can run it with `clisp run.lisp`. Due to the redefinitions as I went through the book, some warnings are expected:
 
 ```sh
-λ ~/Play/distractions/land_of_lisp/dice_of_doom/ master* clisp -c run.lisp
-  i i i i i i i       ooooo    o        ooooooo   ooooo   ooooo
-  I I I I I I I      8     8   8           8     8     o  8    8
-  I  \ `+' /  I      8         8           8     8        8    8
-   \  `-+-'  /       8         8           8      ooooo   8oooo
-    `-__|__-'        8         8           8           8  8
-        |            8     o   8           8     o     8  8
-  ------+------       ooooo    8oooooo  ooo8ooo   ooooo   8
-
-Welcome to GNU CLISP 2.49 (2010-07-07) <http://clisp.cons.org/>
-
-Copyright (c) Bruno Haible, Michael Stoll 1992, 1993
-Copyright (c) Bruno Haible, Marcus Daniels 1994-1997
-Copyright (c) Bruno Haible, Pierpaolo Bernardi, Sam Steingold 1998
-Copyright (c) Bruno Haible, Sam Steingold 1999-2000
-Copyright (c) Sam Steingold, Bruno Haible 2001-2010
-
-Type :h and hit Enter for context help.
-
-;; Compiling file /Users/lfborjas/Play/distractions/land_of_lisp/dice_of_doom/run.lisp ...
-;; Wrote file /Users/lfborjas/Play/distractions/land_of_lisp/dice_of_doom/run.fas
-The following functions were used but not defined:
- SERVE DOD-REQUEST-HANDLER
-0 errors, 0 warnings
-Bye.
-```
-
-Due to the redefinitions as I went through the book, some warnings are expected:
-
-```sh
-Bye.
-λ ~/Play/distractions/land_of_lisp/dice_of_doom/ master* clisp run.fas 
+λ ~/Play/distractions/land_of_lisp/dice_of_doom/ master* clisp run.lisp
 WARNING: DEFUN/DEFMACRO: redefining function ADD-PASSING-MOVE in /Users/lfborjas/Play/distractions/land_of_lisp/dice_of_doom/dice_of_doom_v2.lisp, was defined in
          /Users/lfborjas/Play/distractions/land_of_lisp/dice_of_doom/dice_of_doom_v1.lisp
 WARNING: DEFUN/DEFMACRO: redefining function ATTACKING-MOVES in /Users/lfborjas/Play/distractions/land_of_lisp/dice_of_doom/dice_of_doom_v2.lisp, was defined in
@@ -121,4 +90,10 @@ It'll just sit there until killed with Ctrl-C
 The computer plays with its 3 players and is... very smart:
 
 ![image](https://user-images.githubusercontent.com/82133/48995771-522ca700-f117-11e8-81e8-5ffa2f135129.png)
+
+On commit [d25c917ffc5b851edd96688ba04e34e1e7100be7](https://github.com/lfborjas/distractions/commit/d25c917ffc5b851edd96688ba04e34e1e7100be7) I introduced some changes: the ability to have more human players, some clearer messaging, and printing of rules. Added them to be able to play with my fiancée!
+
+![image](https://user-images.githubusercontent.com/82133/48998582-f3b8f600-f121-11e8-8ebb-127ced6a4a7a.png)
+
+
 
