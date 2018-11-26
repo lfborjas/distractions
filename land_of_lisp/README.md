@@ -93,7 +93,7 @@ The computer plays with its 3 players and is... very smart:
 
 On commit [d25c917ffc5b851edd96688ba04e34e1e7100be7](https://github.com/lfborjas/distractions/commit/d25c917ffc5b851edd96688ba04e34e1e7100be7) I introduced some changes: the ability to have more human players, some clearer messaging, and printing of rules. Added them to be able to play with my fiancée!
 
-![image](https://user-images.githubusercontent.com/82133/48998582-f3b8f600-f121-11e8-8ebb-127ced6a4a7a.png)
+![image](https://user-images.githubusercontent.com/82133/48999152-c4a38400-f123-11e8-8191-bd188cf81df4.png)
 
 
 
