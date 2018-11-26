@@ -35,10 +35,15 @@ C-e` for individual sexps.
 
 ## Games
 
-### Dice of Doom, v1
+### Dice of Doom, v1-2: text-based
 
 An example of DoD, v1, Human vs. Human; using Emacs + SLIME:
 
 ![image](https://user-images.githubusercontent.com/82133/48965920-1c5fb500-ef95-11e8-99fd-84651bbd6909.png)
 
+### Dice of Doom, v3: web based
+
+Playing against a computer using the makeshift webserver from Chapter 13:
+
+<img width="1037" alt="sample DoD game" src="https://user-images.githubusercontent.com/82133/48992744-88622a80-f107-11e8-9fba-0ce9d685fcf1.png">
 
