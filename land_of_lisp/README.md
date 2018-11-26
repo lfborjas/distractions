@@ -54,7 +54,7 @@ Playing against a computer using the makeshift webserver from Chapter 13:
 For this, I wrote `run.lisp`. You can run it with `clisp run.lisp`. Due to the redefinitions as I went through the book, some warnings are expected:
 
 ```sh
-λ ~/Play/distractions/land_of_lisp/dice_of_doom/ master* clisp run.fas 
+λ ~/Play/distractions/land_of_lisp/dice_of_doom/ master* clisp run.lisp
 WARNING: DEFUN/DEFMACRO: redefining function ADD-PASSING-MOVE in /Users/lfborjas/Play/distractions/land_of_lisp/dice_of_doom/dice_of_doom_v2.lisp, was defined in
          /Users/lfborjas/Play/distractions/land_of_lisp/dice_of_doom/dice_of_doom_v1.lisp
 WARNING: DEFUN/DEFMACRO: redefining function ATTACKING-MOVES in /Users/lfborjas/Play/distractions/land_of_lisp/dice_of_doom/dice_of_doom_v2.lisp, was defined in
