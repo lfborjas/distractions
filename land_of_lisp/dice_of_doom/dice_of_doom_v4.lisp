@@ -1,4 +1,5 @@
 ;; Chapter 20 of the book: funnest version of DoD
+; (load "dice_of_doom_v3.lisp)
 
 (defparameter *num-players* 4)
 (defparameter *die-colors*   '((255 63 63) ; red
@@ -65,7 +66,7 @@
   (let ((total (loop repeat dice-num
                      sum (1+ (random 6)))))
     (fresh-line)
-    (format t "On ~a dice rolled ~a. " dice-num total)
+    (format t "Rolling ~a dice; got ~a. " dice-num total)
     total))
 
 (defun roll-against (src-dice dst-dice)
@@ -84,7 +85,10 @@
 ;; Update the interaction functions to use pick-chance-branch
 
 (defun web-handle-human (pos)
-  (cond ((not pos) (princ "Please choose a hexagon to move from:"))
+  (cond ((not pos)
+         ;; This prompt was added by me, see v3.
+         (format t "~a: choose a hexagon to move from:"
+                 (player-color *cur-human-player*)))
         ((eq pos 'pass) (setf *cur-game-tree*
                               (cadr (lazy-car (caddr *cur-game-tree*))))
          (princ "Your reinforcements have been placed.")
@@ -108,7 +112,7 @@
                                          (list *from-tile* pos)))
                                 (caddr *cur-game-tree*))))
            (setf *from-tile* nil)
-           (princ "You may now ")
+           (format t "~a may now " (player-color *cur-human-player*))
            (tag a (href (make-game-link 'pass))
              (princ "pass"))
            (princ " or make another move:"))))

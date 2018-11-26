@@ -126,6 +126,10 @@
 (defparameter *cur-game-tree* nil)
 (defparameter *from-tile* nil)
 
+;; NOTE: added by after finishing the book, to allow other humans to play
+(defparameter *human-players* '(0 2))
+(defparameter *cur-human-player* 0) ; we always start with the first human player
+
 ;; Simple request handler for the game; notice that it only maintains
 ;; state for one human player (cur-game-tree, from-tile). It should
 ;; be possible to add a hash table of trees for multiple players.
@@ -144,6 +148,8 @@
       (progn (princ "<!doctype html")
              (tag center ()
                (princ "Welcome to DICE OF DOOM!")
+               (format t " (The human players are ~a)"
+                       (mapcar #'player-color *human-players*))
                (tag br ())
                (let ((chosen (assoc 'chosen params)))
                  (when (or (not *cur-game-tree*) (not chosen))
@@ -151,25 +157,40 @@
                    (web-initialize))
                  (cond ((lazy-null (caddr *cur-game-tree*))
                         (web-announce-winner (cadr *cur-game-tree*)))
-                       ((zerop (car *cur-game-tree*))
+                       ((member (car *cur-game-tree*) *human-players*)
+                        ;; NOTE: added by me for better human UX
+                        (setf *cur-human-player* (car *cur-game-tree*))
                         (web-handle-human
                          (when chosen
                            (read-from-string (cdr chosen)))))
                        (t (web-handle-computer))))
                (tag br ())
-               (draw-dod-page *cur-game-tree* *from-tile*)))
+               (draw-dod-page *cur-game-tree* *from-tile*)
+               ;; This crude rules printing was added by me:
+               (tag br ())
+               (tag h2 () (princ "Rules:"))
+               (tag ul ()
+                 (tag li () (princ "There are two human and two AI players."))
+                 (tag li () (princ "A player must make at least one attack on each turn. After that, if she can still attack, she may attack or pass."))
+                 (tag li () (princ "A player must first choose an attacking tile and then choose a neighbor to attack: the dice will be rolled for both, and the attacker will only capture if their roll was higher."))
+                 (tag li () (princ "If an attack succeeds, all but one of the player's dice will be moved to the attacked tile, and the opponent's will be removed."))
+                 (tag li () (princ "At the end of the turn, reinforcements will be placed proportional to how many contiguous tiles the player owns after their turn.")))))
       (princ "Sorry, I don't know that page.")))
 
 (defun web-initialize ()
   (setf *from-tile* nil)
   (setf *cur-game-tree* (game-tree (gen-board) 0 0 t)))
 
+;; NOTE: non-book function, makes it a bit easier for the web version
+(defun player-color (n)
+  (nth n '(red blue green purple)))
+
 (defun web-announce-winner (board)
   (fresh-line)
   (let ((w (winners board)))
     (if (> (length w) 1)
-        (format t "The game is a tie between ~a" (mapcar #'player-letter w))
-        (format t "The winner is ~a" (player-letter (car w)))))
+        (format t "The game is a tie between ~a" (mapcar #'player-color w))
+        (format t "The winner is ~a" (player-color (car w)))))
   (tag a (href "game.html")
     (princ " play again")))
 
