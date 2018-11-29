@@ -38,3 +38,16 @@ Prelude> import Euterpea
 Prelude Euterpea> play $ d 4 qn
 Prelude Euterpea> 
 ```
+
+## Emacs setup
+
+Using [haskell-mode](http://haskell.github.io/haskell-mode/manual/latest/), needed to do some setup (put this in a `setup-haskell.el` in my `~/.emacs.d`):
+
+```elisp
+(require 'haskell-interactive-mode)
+(require 'haskell-process)
+(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+```
+
+And then running `C-c C-l` to compile a file (which opens a REPL if not already running), I was able to get a REPL going:
+
