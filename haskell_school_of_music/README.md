@@ -41,7 +41,7 @@ Prelude Euterpea>
 
 ## Emacs setup
 
-Using [haskell-mode](http://haskell.github.io/haskell-mode/manual/latest/), needed to do some setup (put this in a `setup-haskell.el` in my `~/.emacs.d`):
+Using [haskell-mode](http://haskell.github.io/haskell-mode/manual/latest/) as [recommended by the official wiki](https://wiki.haskell.org/Emacs), needed to do some setup (put this in a `setup-haskell.el` in my `~/.emacs.d`):
 
 ```elisp
 (require 'haskell-interactive-mode)
