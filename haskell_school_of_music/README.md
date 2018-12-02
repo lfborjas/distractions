@@ -51,5 +51,5 @@ Using [haskell-mode](http://haskell.github.io/haskell-mode/manual/latest/) as [r
 
 And then running `C-c C-l` to compile a file (which opens a REPL if not already running), I was able to get a REPL going:
 
-![image](https://user-images.githubusercontent.com/82133/49201739-19d3d580-f370-11e8-8af8-baa04c9e28b3.png)
+![image](https://user-images.githubusercontent.com/82133/49345291-c358e680-f650-11e8-966e-277caf797fb6.png)
 
