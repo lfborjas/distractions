@@ -195,3 +195,109 @@ Note that I probably have many more variables than necessary (my first solution 
 only about four lines); but it was fun to introduce more definitions to make
 it more self-explanatory: the notes as transpositions, the chords as compositions
 of notes or transpositions of other chords, the progression as the actual chords.
+
+Exercise 2.2:
+------------
+
+PitchClass implies the use a 12-tone equal temperament scale. Let's
+try to work with the pentatonic blues scale, which in the key of C is approximately
+C, Eb, F, G, and Bb -- root, minor third, fourth, fifth, minor seventh.
+
+1. Define a new algebraic data type called BluesPitchClass: Ro, MT, Fo, Fi, MS
+2. Define a type synonym BluesPitch, akin to Pitch
+3. Define the auxiliary functions ro, mt, fo, fi, ms to construct notes.
+4. Define a `fromBlues` function (:: Music BluesPitch -> Music Pitch) to play
+   using the approximate translation.
+5. Write out a few melodies
+
+> data BluesPitchClass = Ro | MT | Fo | Fi | MS
+> type BluesPitch      = (BluesPitchClass, Octave)
+> ro, mt, fo, fi, ms :: Octave -> Dur -> Music BluesPitch
+> ro o d = note d (Ro, o)
+> mt o d = note d (MT, o)
+> fo o d = note d (Fo, o)
+> fi o d = note d (Fi, o)
+> ms o d = note d (MS, o)
+> translate :: BluesPitch -> Pitch
+> translate (Ro, o) = (C, o)  -- root = C
+> translate (MT, o) = (Ef, o) -- Minor third = E flat
+> translate (Fo, o) = (F, o)  -- fourth = F
+> translate (Fi, o) = (G, o)  -- fifth = G
+> translate (MS, o) = (Bf,o) -- minor seventh = B flat
+> fromBlues :: Music BluesPitch -> Music Pitch
+> fromBlues (Prim (Note d p)) = (Prim (Note d (translate p)))
+> fromBlues (Prim (Rest d)) = Prim (Rest d)
+> fromBlues (m1 :+: m2) = (fromBlues m1) :+: (fromBlues m2)
+> fromBlues (m1 :=: m2) = (fromBlues m1) :=: (fromBlues m2)
+> fromBlues (Modify c m) =  Modify c (fromBlues m)
+
+Which should allow us to write simple melodies:
+
+> bluesMel :: Music BluesPitch
+> bluesMel = ro 4 qn :+: mt 4 qn :+: fo 4 qn :+: fi 4 qn :+: ms 4 qn
+> bluesChord :: Music BluesPitch
+> bluesChord = ro 4 qn :=: mt 4 qn :=: fi 4 qn
+> bluesHarm  = instrument Harmonica bluesChord
+
+And then just: `play (fromBlues bluesMel)`.
+
+I'm not 100% sure if I needed `translate` (could have also been a local definition
+for the base case of fromBlues), but I like how Music being polymorphic
+made it easy to mostly define things in its terms. It's spooky, and satisfying,
+that knowing that the types match means that it'll *work*.
+
+2.4 Absolute Pitches
+====================
+
+There's a useful function that translates a pitch to an integer. Given a (relative)
+pitch, it's defined as 12 times the octave plus the index of the pitch class:
+
+absPitch :: Pitch -> AbsPitch
+absPitch (pc, oct) = 12 * (oct + 1) + pcToInt pc
+
+where pcToInt assigns numbers between -2 and 13 to Cff to Bss:
+
+pcToInt :: PitchClass -> Int
+pcToInt pc = case pc of
+  Cff -> -2; Cf -> -1 ...
+
+To transform an absolute pitch to a pitch is a bit more tricky, due to the
+enharmonics. So Euterpea returns the sharp in those cases:
+
+pitch :: AbsPitch -> Pitch
+pitch ap =
+  let (oct, n) = divMod ap 12 -- divMod x n returns a pair (q,r), where 1 is the integer quotient of x/n, and r is x%n
+  in ([C, Cs, D, ...] !! n, oct - 1)
+
+Where the `list !! n` returns the (n + 1)th element in `list`.
+
+And with this, we can now define `trans`:
+
+trans :: Int -> Pitch -> Pitch
+trans i p = pitch (absPitch p + i)
+
+Exercise 2.5:
+-------------
+
+Define a recursive function transM :: AbsPitch -> Music Pitch -> Music Pitch
+that changes each note in a Music Pitch by transposit it by the AbsPitch interval.
+
+> transM :: AbsPitch -> Music Pitch -> Music Pitch
+> transM ap (Prim (Note d p)) = Prim (Note d (trans ap p))
+> transM ap (Prim (Rest d)) = Prim (Rest d)
+> transM ap (m1 :+: m2) = (transM ap m1) :+: (transM ap m2)
+> transM ap (m1 :=: m2) = (transM ap m1) :=: (transM ap m2)
+> transM ap (Modify c m)   = Modify c (transM ap m)
+
+To prove that it works, let's take our beloved C chord, which transposed 7
+should be G major:
+
+> cMajChord = c 4 qn :=: e 4 qn :=: g 4 qn
+> oneFive = cMajChord :+: (transM 7 cMajChord)
+
+λ> cMajChord
+Prim (Note (2 % 1) (C,4)) :=: (Prim (Note (2 % 1) (E,4)) :=: Prim (Note (2 % 1) (G,4)))
+λ> (transM 7 cMajChord)
+Prim (Note (2 % 1) (G,4)) :=: (Prim (Note (2 % 1) (B,4)) :=: Prim (Note (2 % 1) (D,5)))
+
+Looking at the notes... it worked!
