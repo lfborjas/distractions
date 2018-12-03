@@ -301,3 +301,19 @@ Prim (Note (2 % 1) (C,4)) :=: (Prim (Note (2 % 1) (E,4)) :=: Prim (Note (2 % 1) 
 Prim (Note (2 % 1) (G,4)) :=: (Prim (Note (2 % 1) (B,4)) :=: Prim (Note (2 % 1) (D,5)))
 
 Looking at the notes... it worked!
+
+
+One interesting thing: Euterpea does this sort of similarly, but they
+extract the repetition of matching all Music constructors:
+
+https://github.com/Euterpea/Euterpea2/blob/bc89ee9a47fb06ef5908208609064789fab994a3/Euterpea/Music.lhs#L449-L453
+
++
+
+https://github.com/Euterpea/Euterpea2/blob/bc89ee9a47fb06ef5908208609064789fab994a3/Euterpea/Music.lhs#L478-L479
+
+In particular, given mMap which basically abstracts away the tedium
+matching Music, a transposition function similar to the above becomes:
+
+shiftPitches :: AbsPitch -> Music Pitch -> Music Pitch
+shiftPitches k = mMap (trans k)
