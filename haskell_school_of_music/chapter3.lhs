@@ -309,4 +309,23 @@ Prim (Note (1 % 4) (A,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4)
 λ> play (mkScale (C, 4) [2,1,2,2,1,2,2])
 λ> mkScale (C, 4) [2,1,2,2,1,2,2]
 Prim (Note (1 % 4) (C,4)) :+: (Prim (Note (1 % 4) (D,4)) :+: (Prim (Note (1 % 4) (Ds,4)) :+: (Prim (Note (1 % 4) (F,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (Gs,4)) :+: (Prim (Note (1 % 4) (As,4)) :+: (Prim (Note (1 % 4) (C,5)) :+: Prim (Rest (0 % 1)))))))))
-λ> 
+λ>
+
+3.13 Given one of the major modes, generate a scale:
+https://en.wikipedia.org/wiki/Mode_(music)#Modern_modes
+
+(already defined in euterpea:)
+dataMode = Ionian | Dorian | Phrygian
+  | Lydian | Mixolydian | Aeolian
+  | Locrian
+
+> genScale :: Mode -> Pitch -> Music Pitch
+> genScale m p = let ints = case m of
+>                             Ionian -> [2,2,1,2,2,2,1]
+>                             Dorian -> [2,1,2,2,2,1,2]
+>                             Phrygian -> [1,2,2,2,1,2,2]
+>                             Lydian -> [2,2,2,1,2,2,1]
+>                             Mixolydian -> [2,2,1,2,2,1,2]
+>                             Aeolian -> [2,1,2,2,1,2,2]
+>                             Locrian -> [1,2,2,1,2,2,2]
+>                in mkScale p ints
