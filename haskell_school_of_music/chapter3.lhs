@@ -263,7 +263,7 @@ reverse xs let rev acc [] = acc
 
 Recursive solution:
 
-> apRange :: Ord a => Num a => a -> a -> [a]
+> apRange :: AbsPitch -> AbsPitch -> [AbsPitch]
 > apRange ap1 ap2 = let apr start end acc
 >                         | start == end = acc ++ [start]
 >                         | start >  end = apr (start - 1) end (acc ++ [start])
@@ -356,24 +356,26 @@ General fns: notice that `reductions` is my version of `scanl` as used above:
 > reductions :: (b -> a -> b) -> b -> [a] -> [b]
 > reductions f init [] = init : [] -- turn a single value into a list
 > reductions f init (x:xs) = init : (reductions f (f init x) xs)
-> repeat' :: a -> Int -> [a]
+> repeat' :: Num b => Ord b => a -> b -> [a]
 > repeat' a times  = let r y 0 ys = ys
 >                        r y n ys = r y (n-1) (y:ys)
 >                    in r a times []
 > each :: (a -> b) -> [a] -> [b]
 > each f [] = []
 > each f (x:xs) = (f x):(each f xs)
+> range :: Ord a => Num a => a -> [a]
+> range n = reductions (+) 0 (repeat' 1 n)
 
 Music fns:
 
 > padl :: Music a -> Dur -> Int -> Music a
 > padl mel delayVal delayTimes = (line (repeat' (rest delayVal) delayTimes)) :+: mel
 > voices :: Music a -> Int -> Music a
-> voices mel nVoices = foldl1 (:=:) (each (padl mel hn) (apRange 0 (nVoices - 1)))
+> voices mel nVoices = foldl1 (:=:) (each (padl mel hn) (range (nVoices - 1)))
 > canon :: Music a -> Int -> [InstrumentName] -> Music a
 > canon mel nVoices instruments =
 >   let voice m dur n = instrument (instruments !! n) (padl m dur n)
->   in foldl1 (:=:) (each (voice mel hn) (apRange 0 (nVoices - 1)))
+>   in foldl1 (:=:) (each (voice mel hn) (range (nVoices - 1)))
 
 This generates something you can feed to `play`:
 
