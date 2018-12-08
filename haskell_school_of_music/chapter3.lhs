@@ -360,23 +360,25 @@ General fns: notice that `reductions` is my version of `scanl` as used above:
 > repeat' a times  = let r y 0 ys = ys
 >                        r y n ys = r y (n-1) (y:ys)
 >                    in r a times []
+> repeatedly :: Int -> a -> [a]
+> repeatedly n x = take n (repeat x)
 > each :: (a -> b) -> [a] -> [b]
 > each f [] = []
 > each f (x:xs) = (f x):(each f xs)
-> range :: Ord a => Num a => a -> [a]
-> range n = reductions (+) 0 (repeat' 1 n)
+> range :: Num a => Int -> [a]
+> range n = reductions (+) 0 (repeatedly n 1)
 
 Music fns:
 
-> padl :: Music a -> Dur -> Int -> Music a
-> padl mel delayVal delayTimes = let rests dv dt = line (repeat' (rest dv) dt)
->                                in (rests delayVal delayTimes) :+: mel
+> delay :: Music a -> Dur -> Int -> Music a
+> delay mel delayVal delayTimes = let rests dv dt = line (repeatedly dt (rest dv))
+>                                 in (rests delayVal delayTimes) :+: mel
 > voices :: Music a -> Int -> Music a
-> voices mel nVoices = foldl1 (:=:) (each (padl mel hn) (range (nVoices - 1)))
+> voices mel nVoices = foldl1 (:=:) (each (delay mel hn) (range (nVoices - 1)))
 > canon :: Music a -> Int -> [InstrumentName] -> Music a
 > canon mel nVoices instruments =
 >   let chooseInstrument n = instruments !! (n `mod` (length instruments))
->       voice m dur n = instrument (chooseInstrument n) (padl m dur n)
+>       voice m dur n = instrument (chooseInstrument n) (delay m dur n)
 >   in foldl1 (:=:) (each (voice mel hn) (range (nVoices - 1)))
 
 This generates something you can feed to `play`:
