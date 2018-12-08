@@ -375,7 +375,8 @@ Music fns:
 > voices mel nVoices = foldl1 (:=:) (each (padl mel hn) (range (nVoices - 1)))
 > canon :: Music a -> Int -> [InstrumentName] -> Music a
 > canon mel nVoices instruments =
->   let voice m dur n = instrument (instruments !! n) (padl m dur n)
+>   let chooseInstrument n = instruments !! (n `mod` (length instruments))
+>       voice m dur n = instrument (chooseInstrument n) (padl m dur n)
 >   in foldl1 (:=:) (each (voice mel hn) (range (nVoices - 1)))
 
 This generates something you can feed to `play`:
