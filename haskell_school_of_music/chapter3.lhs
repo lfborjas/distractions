@@ -240,7 +240,7 @@ Exercises
 =========
 
 3.9 Define a polymorphic function fuse :: [Dur] -> [Dur -> Music a] -> [Music a]
-    that comines a list of durations with a list of notes without duration.
+    that combines a list of durations with a list of notes without duration.
 
 > fuse :: [Dur] -> [Dur -> Music a] -> [Music a]
 > fuse [ ] [ ] = []
@@ -263,7 +263,7 @@ reverse xs let rev acc [] = acc
 
 Recursive solution:
 
-> apRange :: AbsPitch -> AbsPitch -> [AbsPitch]
+> apRange :: Ord a => Num a => a -> a -> [a]
 > apRange ap1 ap2 = let apr start end acc
 >                         | start == end = acc ++ [start]
 >                         | start >  end = apr (start - 1) end (acc ++ [start])
@@ -329,3 +329,53 @@ dataMode = Ionian | Dorian | Phrygian
 >                             Aeolian -> [2,1,2,2,1,2,2]
 >                             Locrian -> [1,2,2,1,2,2,2]
 >                in mkScale p ints
+
+3.14 Write the melody of Frère Jacques. Then, using functions already defined,
+     generate a four-part round (four _identical_ voices), each delayed succesively
+     by two measures. Use a different instrument for each voice.
+
+https://en.wikipedia.org/wiki/Fr%C3%A8re_Jacques#/media/File:YB4001Canon_Frere_Jacques.png
+
+> frereJacques :: Music Pitch
+> frereJacques = line [g 4 qn, a 4 qn, b 4 qn, g 4 qn,
+>                      g 4 qn, a 4 qn, b 4 qn, g 4 qn,
+>                      b 4 qn, c 5 qn, d 5 hn,
+>                      b 4 qn, c 5 qn, d 5 hn,
+>                      d 5 den, e 5 sn, d 5 en, c 5 en, b 4 qn, g 4 qn,
+>                      d 5 den, e 5 sn, d 5 en, c 5 en, b 4 qn, g 4 qn,
+>                      g 4 qn, e 4 qn, g 4 hn,
+>                      g 4 qn, e 4 qn, g 4 hn]
+> shortFrereJacques :: Music Pitch
+> shortFrereJacques = line [g 4 qn, a 4 qn, b 4 qn, g 4 qn,
+>                           b 4 qn, c 5 qn, d 5 hn,
+>                           d 5 den, e 5 sn, d 5 en, c 5 en, b 4 qn, g 4 qn,
+>                           g 4 qn, e 4 qn, g 4 hn]
+
+General fns: notice that `reductions` is my version of `scanl` as used above:
+
+> reductions :: (b -> a -> b) -> b -> [a] -> [b]
+> reductions f init [] = init : [] -- turn a single value into a list
+> reductions f init (x:xs) = init : (reductions f (f init x) xs)
+> repeat' :: a -> Int -> [a]
+> repeat' a times  = let r y 0 ys = ys
+>                        r y n ys = r y (n-1) (y:ys)
+>                    in r a times []
+> each :: (a -> b) -> [a] -> [b]
+> each f [] = []
+> each f (x:xs) = (f x):(each f xs)
+
+Music fns:
+
+> padl :: Music a -> Dur -> Int -> Music a
+> padl mel delayVal delayTimes = (line (repeat' (rest delayVal) delayTimes)) :+: mel
+> voices :: Music a -> Int -> Music a
+> voices mel nVoices = foldl1 (:=:) (each (padl mel hn) (apRange 0 (nVoices - 1)))
+> canon :: Music a -> Int -> [InstrumentName] -> Music a
+> canon mel nVoices instruments =
+>   let voice m dur n = instrument (instruments !! n) (padl m dur n)
+>   in foldl1 (:=:) (each (voice mel hn) (apRange 0 (nVoices - 1)))
+
+This generates something you can feed to `play`:
+
+λ> (canon shortFrereJacques 4 [AcousticGrandPiano, PizzicatoStrings, Piccolo, Glockenspiel])
+((Modify (Instrument AcousticGrandPiano) (Prim (Rest (0 % 1)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (A,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (C,5)) :+: (Prim (Note (1 % 2) (D,5)) :+: (Prim (Note (3 % 16) (D,5)) :+: (Prim (Note (1 % 16) (E,5)) :+: (Prim (Note (1 % 8) (D,5)) :+: (Prim (Note (1 % 8) (C,5)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (E,4)) :+: (Prim (Note (1 % 2) (G,4)) :+: Prim (Rest (0 % 1))))))))))))))))))) :=: Modify (Instrument PizzicatoStrings) ((Prim (Rest (1 % 2)) :+: Prim (Rest (0 % 1))) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (A,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (C,5)) :+: (Prim (Note (1 % 2) (D,5)) :+: (Prim (Note (3 % 16) (D,5)) :+: (Prim (Note (1 % 16) (E,5)) :+: (Prim (Note (1 % 8) (D,5)) :+: (Prim (Note (1 % 8) (C,5)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (E,4)) :+: (Prim (Note (1 % 2) (G,4)) :+: Prim (Rest (0 % 1)))))))))))))))))))) :=: Modify (Instrument Piccolo) ((Prim (Rest (1 % 2)) :+: (Prim (Rest (1 % 2)) :+: Prim (Rest (0 % 1)))) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (A,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (C,5)) :+: (Prim (Note (1 % 2) (D,5)) :+: (Prim (Note (3 % 16) (D,5)) :+: (Prim (Note (1 % 16) (E,5)) :+: (Prim (Note (1 % 8) (D,5)) :+: (Prim (Note (1 % 8) (C,5)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (E,4)) :+: (Prim (Note (1 % 2) (G,4)) :+: Prim (Rest (0 % 1)))))))))))))))))))) :=: Modify (Instrument Glockenspiel) ((Prim (Rest (1 % 2)) :+: (Prim (Rest (1 % 2)) :+: (Prim (Rest (1 % 2)) :+: Prim (Rest (0 % 1))))) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (A,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (C,5)) :+: (Prim (Note (1 % 2) (D,5)) :+: (Prim (Note (3 % 16) (D,5)) :+: (Prim (Note (1 % 16) (E,5)) :+: (Prim (Note (1 % 8) (D,5)) :+: (Prim (Note (1 % 8) (C,5)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (E,4)) :+: (Prim (Note (1 % 2) (G,4)) :+: Prim (Rest (0 % 1)))))))))))))))))))
