@@ -369,7 +369,8 @@ General fns: notice that `reductions` is my version of `scanl` as used above:
 Music fns:
 
 > padl :: Music a -> Dur -> Int -> Music a
-> padl mel delayVal delayTimes = (line (repeat' (rest delayVal) delayTimes)) :+: mel
+> padl mel delayVal delayTimes = let rests dv dt = line (repeat' (rest dv) dt)
+>                                in (rests delayVal delayTimes) :+: mel
 > voices :: Music a -> Int -> Music a
 > voices mel nVoices = foldl1 (:=:) (each (padl mel hn) (range (nVoices - 1)))
 > canon :: Music a -> Int -> [InstrumentName] -> Music a
