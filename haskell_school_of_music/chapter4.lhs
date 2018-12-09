@@ -262,8 +262,10 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 >              in instrument Harpsichord
 >                 (tempo t (bass :=: treble))
 > treble = trebl1 :+: (trebl2 :=: trebl3) :+:
->          trebl4 :+: (trebl5 :=: trebl6)
-> bass   = bas1 :+: bas2
+>          trebl4 :+: (trebl5 :=: trebl6) :+:
+>          trebl7 :+: (trebl8 :=: trebl9)
+> bass   = bas1 :+: bas2 :+: (bas3 :=: bas4) :+:
+>          bas5
 > trebl1 = addDur sn [b 4, fs 4, fs 4,
 >                      g 4, fs 4, fs 4,
 >                      b 4, fs 4, fs 4,
@@ -335,8 +337,8 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 >                                a 2, cs 3, a 2, fs 2, a 2, fs 2] -- bar 13
 > ---- Defining them more closely together since bar 14:
 > trebl6 = fs 4 den :+: denr :+: denr :+: -- bar 14
->          wnr :+: -- bar 15
->          wnr -- bar 16
+>          times 3 (denr) :+: -- bar 15 (the score has it as wnr
+>          times 3 (denr) -- bar 16     but it was delayed too long)
 > trebl5 = pedal2 (a 3 sn) [d 4, b 3, d 4] :+: -- bar 14
 >          pedal2 (a 3 sn) [e 4, b 3, e 4] :+: -- bar 15
 >          addDur tn [fs 4, d 4, a 4, d 5, b 4,
@@ -345,3 +347,15 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 > bas2 = d 2 den :+: snr :+: walk sn [d 2, e 2, f 2] :+: -- bar 14
 >        cs 2 den :+: snr :+: walk sn [a 2, b 2, cs 3] :+: -- bar 15
 >        d 3 (den + sn) :+: addDur sn [e 3, fs 3, e 3, fs 3, gs 3, d 3] -- bar 16
+> trebl7 = pedal2 (e 4 sn) [a 4, fs 4, a 4] :+: -- bar 17
+>          pedal2 (e 4 sn) [b 4, fs 4, b 4] :+: -- bar 18
+>          addDur tn [cs 5, a 4, cs 5, e 5, a 5, fs 5,
+>                     ds 5, fs 5, ds 5, b 4, ds 5, b 4,
+>                     fs 4, b 4, fs 4, ds 4, fs 4, ds 4] -- bar 19
+> bas4 = e 3 den :+: snr :+: walk sn [a 3, b 3, cs 4] :+: -- bar 17
+>        gs 3 (den + sn) :+: addDur sn [a 3, b 3, a 3, b 3, gs 3] :+: -- bar 18
+>        a 3  (den + sn) :+: addDur sn [b 3, c 4, b 3, c 4, a 3] -- bar 19
+> bas3 = cs 3 den :+: denr :+: denr :+: -- bar 17
+>        e  3 den :+: denr :+: denr :+: --bar 18
+>        a  2 den :+: fs 3 dqn -- bar 19
+> trebl9 = 
