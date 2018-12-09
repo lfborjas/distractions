@@ -240,6 +240,7 @@ Exercise: transcribe a song by a favorite composer
 
 Bach's Sinfonia 15 in B minor
 https://imslp.org/wiki/Sinfonia_in_B_minor,_BWV_801_(Bach,_Johann_Sebastian)
+(a fantastic rendition: https://www.youtube.com/watch?v=Ya1m3kI2YM0)
 
 Note that the numerator in the second term in the `t` value
 is a good control of speed: less than the default of 120 makes it slower, e.g.
@@ -248,11 +249,21 @@ The 9/16 in the first term is simply from the score.
 Note that all instances C and F are meant to be sharp, as this is in the
 key of B Minor
 
+some auxiliary functions (uses list comprehensions, introduced in the next chapter):
+
+> pedal :: Int -> Music a -> [Dur -> Music a] -> Music a
+> pedal t (Prim (Note d p)) ms = line [ m d :+: times 2 (note d p) | m <- ms ]
+> pedal2 = pedal 2
+> walk :: Dur -> [Dur -> Music a] -> Music a
+> walk d (a:b:c:_) = addDur d [a,b,c,b,a]
+
 > sinfonia15 :: Music Pitch
 > sinfonia15 = let t = (9/16) * (140/120)
 >              in instrument Harpsichord
 >                 (tempo t (bass :=: treble))
-> treble = trebl1 :+: (trebl2 :=: trebl3) :+: trebl4
+> treble = trebl1 :+: (trebl2 :=: trebl3) :+:
+>          trebl4 :+: (trebl5 :=: trebl6)
+> bass   = bas1 :+: bas2
 > trebl1 = addDur sn [b 4, fs 4, fs 4,
 >                      g 4, fs 4, fs 4,
 >                      b 4, fs 4, fs 4,
@@ -297,7 +308,7 @@ key of B Minor
 >                     cs 4, e 4, cs 4, a 3, cs 4, a 3] :+:
 >          addDur sn [a 4, fs 4, g 4] :+: -- bar 13
 >          (fs 4 den :=: d 4 sn)
-> bass = b 2 den :+: snr :+:
+> bas1 = b 2 den :+: snr :+:
 >        addDur sn [b 3, cs 4, d 4, cs 4, b 3] :+:
 >        as 3 (den + sn) :+: -- bars 1-2
 >        addDur sn [b 3, cs 4, b 3, cs 4, as 3] :+:
@@ -321,5 +332,16 @@ key of B Minor
 >        fs 2 den :+: addDur tn [fs 3, a 3, fs 3, d 3, fs 3, d 3,
 >                                b 2, d 3, b 2, g 2, b 2, g 2] :+: -- bar 12
 >        e 2 den  :+: addDur tn [e 3, g 3, e 3, cs 3, e 3, cs 3,
->                                a 2, cs 3, a 2, fs 2, a 2, fs 2] :+: -- bar 13
->        d 2 den -- bar 14, incomplete
+>                                a 2, cs 3, a 2, fs 2, a 2, fs 2] -- bar 13
+> ---- Defining them more closely together since bar 14:
+> trebl6 = fs 4 den :+: denr :+: denr :+: -- bar 14
+>          wnr :+: -- bar 15
+>          wnr -- bar 16
+> trebl5 = pedal2 (a 3 sn) [d 4, b 3, d 4] :+: -- bar 14
+>          pedal2 (a 3 sn) [e 4, b 3, e 4] :+: -- bar 15
+>          addDur tn [fs 4, d 4, a 4, d 5, b 4,
+>                     gs 4, b 4, gs 4, e 4, gs 4, e 4] :+:
+>          addDur tn [b 3, e 4, b 3, gs 3, b 3, gs 3] -- bar 16
+> bas2 = d 2 den :+: snr :+: walk sn [d 2, e 2, f 2] :+: -- bar 14
+>        cs 2 den :+: snr :+: walk sn [a 2, b 2, cs 3] :+: -- bar 15
+>        d 3 (den + sn) :+: addDur sn [e 3, fs 3, e 3, fs 3, gs 3, d 3] -- bar 16
