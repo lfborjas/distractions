@@ -264,11 +264,13 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 > sinfonia15 = let t = (9/16) * (140/120)
 >              in instrument Harpsichord
 >                 (tempo t (bass :=: treble))
-> treble = trebl1 :+: (trebl2 :=: trebl3) :+:
->          trebl4 :+: (trebl5 :=: trebl6) :+:
->          trebl7 :+: (trebl8 :=: trebl9)
-> bass   = bas1 :+: bas2 :+: (bas3 :=: bas4) :+:
->          bas5
+> treble = trebl1  :+: (trebl2 :=: trebl3) :+:
+>          trebl4  :+: (trebl5 :=: trebl6) :+:
+>          trebl7  :+: (trebl8 :=: trebl9) :+:
+>          trebl10 
+> bass   = bas1 :+:
+>          bas2 :+: (bas3 :=: bas4) :+:
+>          bas5 :+: (bas6 :=: bas7)
 > trebl1 = addDur sn [b 4, fs 4, fs 4,
 >                      g 4, fs 4, fs 4,
 >                      b 4, fs 4, fs 4,
@@ -361,6 +363,7 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 > bas3 = cs 3 den :+: denr :+: denr :+: -- bar 17
 >        e  3 den :+: denr :+: denr :+: --bar 18
 >        a  2 den :+: fs 3 dqn -- bar 19
+> --- something may be weird with the times starting in bar 20?
 > trebl9 = e 4 den :+: denr :+: g 4 (den + sn) :+: -- bar 20
 >          pedal'2 (e 4 sn) [fs 4, a 4] :+: -- bar 21
 >          fs 4 (dqn + den + sn) :+: -- bar 22 - 23.025
@@ -376,4 +379,62 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 >          d 3 den :+: snr :+: walk sn [d 3, e 3, fs 3] :+: -- bar 22
 >          g 3 den :+: snr :+: walk sn [g 3, fs 3, e 3] :+: -- bar 23
 >          cs 3 den :+: snr :+: walk sn [cs 3, b 2, as 2] -- bar 24
+> -- final stretch: bar 25
+> trebl10 = rest 0
+> bas7    = rest 0
+> bas6    = rest 0
+
+
+Another fun tune, perhaps for the presentation:
+https://imslp.org/wiki/Toccata_and_Fugue_in_D_minor%2C_BWV_565_(Bach%2C_Johann_Sebastian)
+Bach's tocatta and fugue in d-moll: https://www.youtube.com/watch?v=ho9rZjlsyYY
+only the first few bars, however:
+
+
+> mordent' :: Int -> Music Pitch -> Music Pitch
+> mordent' n (Prim (Note d p)) =
+>   (note (d/16) p) :+: (note (d/16) (trans n p)) :+: (note (14 * d/16) p)
+> invMordent :: Music Pitch -> Music Pitch
+> invMordent = mordent' (-1)
+> mordent :: Music Pitch -> Music Pitch
+> mordent = mordent' 1
+> wait :: Int -> Dur -> Music Pitch -> Music Pitch
+> wait n d p = (times n (rest d)) :+: p
+
+> tocattaDMoll :: Music Pitch
+> tocattaDMoll = let t = (4/4) * (20/120)
+>                in instrument StringEnsemble1
+>                   (tempo t ((manuale :=: pedale) :=:
+>                             (manuale :=: pedale)))
+> manuale = voice1a :=: voice2a 
+> pedale = voice3a :+: 
+>          voice3b :=: voice4a :+: (bigChord :=: coda)
+> voice1a = invMordent (a 5 en) :+: tnr :+:
+>           addDur sfn [g 5, f 5, e 5, d 5] :+: cs 5 tn :+:
+>           d 5 sn
+> voice2a = invMordent (a 4 en) :+: tnr :+:
+>           addDur sfn [g 4, f 4, e 4, d 4] :+: cs 4 tn :+:
+>           d 4 sn :+:
+>           invMordent (a 4 en) :+: tnr :+:
+>           addDur tn [e 4, f 4, cs 4, d 4] :+: rest (tn + sn)
+> voice3a = rest (en + tn + sfn + sfn + sfn + sfn + tn + sn) :+:
+>           invMordent (a 3 en) :+: tnr :+:
+>           addDur tn [e 3, f 3, cs 3, d 3] :+: rest (tn + sn)
+> voice3b = invMordent (a 3 en) :+: tnr :+:
+>           addDur sfn [g 3, f 3, e 3, d 3] :+: cs 3 tn :+:
+>           d 3 sn :+: rest (tn + sn)
+> voice4a = invMordent (a 2 en) :+: tnr :+:
+>           addDur sfn [g 2, f 2, e 2, d 2] :+: cs 2 tn :+:
+>           d 2 sn :+: rest (tn + sn)
+> bigChord = chord [c0, c1, c2, c3, c4, c5, c6]
+> c0 = wait 0 sn (d 2 hn)
+> c1 = wait 1 sn (cs 3  (qn + qn))
+> c2 = (wait 2 sn (e  3 (qn + qn)))
+> c3 = (wait 3 sn (g  3 (qn + qn + sn)))
+> c4 = (wait 4 sn (b  3 (qn + qn)))
+> c5 = (wait 5 sn (cs 4 (qn + qn))) 
+> c6 = (wait 6 sn (e  4 (qn + qn)))
+> coda = wait 6 sn (rest (qn + qn)) :+:
+>        (d 3 qn :=: a 3 qn :=: d 4 qn) :=:
+>        wait 1 sn (e 3 sn :+: fs 3 en)
 
