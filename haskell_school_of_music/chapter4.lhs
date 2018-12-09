@@ -252,7 +252,8 @@ key of B Minor
 > sinfonia15 = let t = (9/16) * (140/120)
 >              in instrument Harpsichord
 >                 (tempo t (bass :=: treble))
-> treble = addDur sn [b 4, fs 4, fs 4,
+> treble = trebl1 :+: (trebl2 :=: trebl3)
+> trebl1 = addDur sn [b 4, fs 4, fs 4,
 >                      g 4, fs 4, fs 4,
 >                      b 4, fs 4, fs 4,
 >                      cs 5, fs 4, fs 4,
@@ -269,7 +270,26 @@ key of B Minor
 >          addDur tn [b 4, fs 4, b 4, d 5, f 5, d 5,
 >                     b 4, d 5, b 4, fs 4, b 4, fs 4,
 >                     d 4, fs 4, d 4, b 3, d 4, b 4] -- bar 6
->          
+> trebl3 = d 5 (dqn + den + sn) :+: -- bar 7, 8.25
+>          addDur sn [b 4, b 4,
+>                     cs 5, b 4, b 4,
+>                     e  5, b 4, b 4] :+: -- bar 8
+>          cs 5 (dqn + den + sn) :+: -- bar 9, 10.25
+>          addDur sn [a 4, a 4,
+>                     b 4, a 4, a 4,
+>                     d 5, a 4, a 4] :+: -- bar 10
+>          addDur tn [b 4, d 5, b 4, g 4, b 4, g 4] :+:
+>          e 4 den :+:
+>          addDur tn [e 5, g 5, e 5, cs 5, e 5, cs 5] -- bar 11
+> trebl2 = addDur sn [b 4, fs 4, fs 4,
+>                     g 4, fs 4, fs 4,
+>                     b 4, fs 4, fs 4] :+: -- bar 7
+>          gs 4 (dqn + den) :+: -- bar 8
+>          addDur sn [a 4, e 4, e 4,
+>                     fs 4, e 4, e 4,
+>                     a 4, e 4, e 4] :+: -- bar 9
+>          fs 4 (dqn + den) :+: -- bar 10
+>          g 4 sn :+: snr :+: snr :+: denr :+: denr -- bar 11
 > bass = b 2 den :+: snr :+:
 >        addDur sn [b 3, cs 4, d 4, cs 4, b 3] :+:
 >        as 3 (den + sn) :+: -- bars 1-2
@@ -283,4 +303,11 @@ key of B Minor
 >                   cs 3, fs 3, fs 3] :+: -- bars 4-5
 >        addDur tn [d 4, b 3, d 4, fs 4, b 4, d 5,
 >                   d 4, fs 4, d 4, b 3, fs 4, b 3,
->                   fs 3, b 3, fs 3, d 3, fs 3, d 3] -- bar 6
+>                   fs 3, b 3, fs 3, d 3, fs 3, d 3] :+: -- bar 6
+>        b 2 den :+: snr :+: addDur sn [b 3, cs 4, d 4, cs 4, b 3] :+: -- bar 7
+>        e 4 den :+: snr :+: addDur sn [e 3, fs 3, gs 3, fs 3, e 3] :+: -- bar 8
+>        a 3 den :+: snr :+: addDur sn [a 2, b 2, cs 3, b 2, a 2] :+: -- bar 9
+>        d 3 den :+: snr :+: addDur sn [d 2, e 2, fs 2, e 2, d 2] :+: -- bar 10
+>        g 2 den :+:
+>        addDur tn [g 3, b 3, g 3, e 3, g 3, e 3,
+>                   cs 3, e 3, cs 3, a 2, cs 3, a 2] -- bar 11
