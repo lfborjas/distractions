@@ -234,3 +234,53 @@ Example melodies:
 
 > mel1 = [c 5 en, e 5 sn, g 5 en, b 5 sn, a 5 en, f 5 sn, d 5 en, b 4 sn, c 5 en]
 > mel2 = [c 5 sn, e 5 sn, g 5 sn, b 5 sn, a 5 sn, f 5 sn, d 5 sn, b 4 sn, c 5 sn]
+
+
+Exercise: transcribe a song by a favorite composer
+
+Bach's Sinfonia 15 in B minor
+https://imslp.org/wiki/Sinfonia_in_B_minor,_BWV_801_(Bach,_Johann_Sebastian)
+
+Note that the numerator in the second term in the `t` value
+is a good control of speed: less than the default of 120 makes it slower, e.g.
+The 9/16 in the first term is simply from the score.
+
+Note that all instances C and F are meant to be sharp, as this is in the
+key of B Minor
+
+> sinfonia15 :: Music Pitch
+> sinfonia15 = let t = (9/16) * (140/120)
+>              in instrument Harpsichord
+>                 (tempo t (bass :=: treble))
+> treble = addDur sn [b 4, fs 4, fs 4,
+>                      g 4, fs 4, fs 4,
+>                      b 4, fs 4, fs 4,
+>                      cs 5, fs 4, fs 4,
+>                      g 5, fs 4, fs 4,
+>                      cs 5, fs 4, fs 4] :+: -- bars 1-2
+>          addDur tn [d 5,
+>                     b 4, d 5, fs 5, a 5,
+>                     fs 5,
+>                     d 5, fs 5,
+>                     d 5, b 4, d 5, b 4,
+>                     fs 4, b 4, fs 4, d 4, fs 4, d 4] :+: -- bar 3
+>          b 3 sn :+: times 3 snr :+: addDur sn [b 4, cs 5, d 5, cs 5, b 4] :+: -- bar 4
+>          as 4 (den + sn) :+: addDur sn [b 4, cs 5, b 4, cs 5, as 4] :+: -- bar 5
+>          addDur tn [b 4, fs 4, b 4, d 5, f 5, d 5,
+>                     b 4, d 5, b 4, fs 4, b 4, fs 4,
+>                     d 4, fs 4, d 4, b 3, d 4, b 4] -- bar 6
+>          
+> bass = b 2 den :+: snr :+:
+>        addDur sn [b 3, cs 4, d 4, cs 4, b 3] :+:
+>        as 3 (den + sn) :+: -- bars 1-2
+>        addDur sn [b 3, cs 4, b 3, cs 4, as 3] :+:
+>        b 3 den :+: denr :+: denr :+: -- bar 3
+>        addDur sn [b 3, fs 3, fs 3,
+>                   g 3, fs 3, fs 3,
+>                   b 3, fs 3, fs 3,
+>                   cs 3, fs 3, fs 3,
+>                   g 3, fs 3, fs 3,
+>                   cs 3, fs 3, fs 3] :+: -- bars 4-5
+>        addDur tn [d 4, b 3, d 4, fs 4, b 4, d 5,
+>                   d 4, fs 4, d 4, b 3, fs 4, b 3,
+>                   fs 3, b 3, fs 3, d 3, fs 3, d 3] -- bar 6
