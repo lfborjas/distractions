@@ -256,6 +256,9 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 > pedal2 = pedal 2
 > walk :: Dur -> [Dur -> Music a] -> Music a
 > walk d (a:b:c:_) = addDur d [a,b,c,b,a]
+> pedal' :: Int -> Music a -> [Dur -> Music a] -> Music a
+> pedal' t pn ms = (times t pn) :+: pedal t pn ms -- start with pedal
+> pedal'2 = pedal' 2
 
 > sinfonia15 :: Music Pitch
 > sinfonia15 = let t = (9/16) * (140/120)
@@ -358,4 +361,19 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 > bas3 = cs 3 den :+: denr :+: denr :+: -- bar 17
 >        e  3 den :+: denr :+: denr :+: --bar 18
 >        a  2 den :+: fs 3 dqn -- bar 19
-> trebl9 = 
+> trebl9 = e 4 den :+: denr :+: g 4 (den + sn) :+: -- bar 20
+>          pedal'2 (e 4 sn) [fs 4, a 4] :+: -- bar 21
+>          fs 4 (dqn + den + sn) :+: -- bar 22 - 23.025
+>          pedal'2 (d 4 sn) [e 4, g 4] :+: -- bar 23
+>          e 4 (dqn + den + sn) -- bar 24
+> trebl8 = pedal2 (b 3 sn) [e 4, c 4, e 4] :+: -- bar 20
+>          cs 4 (dqn + den + sn) :+: -- bar 21, 22.025
+>          pedal'2 (a 3 sn) [b 3, d 4] :+: -- bar 22
+>          b  3 (dqn + den + sn) :+: -- bar 23,24.025
+>          pedal'2 (gs 3 sn) [a 3, c 4] -- bar 24
+> bas5   = g 3 den :+: snr :+: walk sn [e 3, fs 3, g 3] :+: -- bar 20
+>          a 3 den :+: snr :+: walk sn [a 2, b 2, cs 3] :+: -- bar 21
+>          d 3 den :+: snr :+: walk sn [d 3, e 3, fs 3] :+: -- bar 22
+>          g 3 den :+: snr :+: walk sn [g 3, fs 3, e 3] :+: -- bar 23
+>          cs 3 den :+: snr :+: walk sn [cs 3, b 2, as 2] -- bar 24
+
