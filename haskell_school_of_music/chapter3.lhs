@@ -351,7 +351,9 @@ https://en.wikipedia.org/wiki/Fr%C3%A8re_Jacques#/media/File:YB4001Canon_Frere_J
 >                           d 5 den, e 5 sn, d 5 en, c 5 en, b 4 qn, g 4 qn,
 >                           g 4 qn, e 4 qn, g 4 hn]
 
-General fns: notice that `reductions` is my version of `scanl` as used above:
+General fns: notice that `reductions` is my version of `scanl` as used above,
+and `take` and `repeat` are in the standard prelude:
+
 
 > reductions :: (b -> a -> b) -> b -> [a] -> [b]
 > reductions f init [] = init : [] -- turn a single value into a list
@@ -385,3 +387,29 @@ This generates something you can feed to `play`:
 
 λ> (canon shortFrereJacques 4 [AcousticGrandPiano, PizzicatoStrings, Piccolo, Glockenspiel])
 ((Modify (Instrument AcousticGrandPiano) (Prim (Rest (0 % 1)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (A,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (C,5)) :+: (Prim (Note (1 % 2) (D,5)) :+: (Prim (Note (3 % 16) (D,5)) :+: (Prim (Note (1 % 16) (E,5)) :+: (Prim (Note (1 % 8) (D,5)) :+: (Prim (Note (1 % 8) (C,5)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (E,4)) :+: (Prim (Note (1 % 2) (G,4)) :+: Prim (Rest (0 % 1))))))))))))))))))) :=: Modify (Instrument PizzicatoStrings) ((Prim (Rest (1 % 2)) :+: Prim (Rest (0 % 1))) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (A,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (C,5)) :+: (Prim (Note (1 % 2) (D,5)) :+: (Prim (Note (3 % 16) (D,5)) :+: (Prim (Note (1 % 16) (E,5)) :+: (Prim (Note (1 % 8) (D,5)) :+: (Prim (Note (1 % 8) (C,5)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (E,4)) :+: (Prim (Note (1 % 2) (G,4)) :+: Prim (Rest (0 % 1)))))))))))))))))))) :=: Modify (Instrument Piccolo) ((Prim (Rest (1 % 2)) :+: (Prim (Rest (1 % 2)) :+: Prim (Rest (0 % 1)))) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (A,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (C,5)) :+: (Prim (Note (1 % 2) (D,5)) :+: (Prim (Note (3 % 16) (D,5)) :+: (Prim (Note (1 % 16) (E,5)) :+: (Prim (Note (1 % 8) (D,5)) :+: (Prim (Note (1 % 8) (C,5)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (E,4)) :+: (Prim (Note (1 % 2) (G,4)) :+: Prim (Rest (0 % 1)))))))))))))))))))) :=: Modify (Instrument Glockenspiel) ((Prim (Rest (1 % 2)) :+: (Prim (Rest (1 % 2)) :+: (Prim (Rest (1 % 2)) :+: Prim (Rest (0 % 1))))) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (A,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (C,5)) :+: (Prim (Note (1 % 2) (D,5)) :+: (Prim (Note (3 % 16) (D,5)) :+: (Prim (Note (1 % 16) (E,5)) :+: (Prim (Note (1 % 8) (D,5)) :+: (Prim (Note (1 % 8) (C,5)) :+: (Prim (Note (1 % 4) (B,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (G,4)) :+: (Prim (Note (1 % 4) (E,4)) :+: (Prim (Note (1 % 2) (G,4)) :+: Prim (Rest (0 % 1)))))))))))))))))))
+
+
+More notes about the presentation:
+
+show apRange as a predecessor to `range`; show how Int makes sense since
+other numbers don't really work for repeat/repeatedly.
+Show how an infinite list is pretty elegant in a lazy language:
+http://hackage.haskell.org/package/base-4.12.0.0/docs/src/GHC.List.html#repeat
+repeat :: a -> [a]
+{-# INLINE [0] repeat #-}
+-- The pragma just gives the rules more chance to fire
+repeat x = xs where xs = x : xs
+
+
+http://hackage.haskell.org/package/base-4.12.0.0/docs/src/GHC.List.html#take:
+
+
+{- We always want to inline this to take advantage of a known length argument
+sign. Note, however, that it's important for the RULES to grab take, rather
+than trying to INLINE take immediately and then letting the RULES grab
+unsafeTake. Presumably the latter approach doesn't grab it early enough; it led
+to an allocation regression in nofib/fft2. -}
+{-# INLINE [1] take #-}
+take n xs | 0 < n     = unsafeTake n xs
+          | otherwise = []
+
