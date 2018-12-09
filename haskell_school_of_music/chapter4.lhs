@@ -206,3 +206,31 @@ Some notes:
 > childSong6 = let t = (dhn/qn) * (69/120)
 >              in instrument RhodesPiano
 >                 (tempo t (bassLine :=: mainVoice))
+
+
+4.4 Simple Algorithmic Composition
+----------------------------------
+
+A simple algorithmic technique is introduced: given a simple melody,
+we find all proper prefixes and then play them in two voices, one the reverse of
+the other, played in parallel, then transposed a perfect fourth, then repeat.
+
+> prefixes :: [a] -> [[a]]
+> prefixes [] = []
+> prefixes (x:xs) = let f pf = x:pf
+>                   in [x] : map f (prefixes xs)
+
+e.g.
+λ> prefixes [1,2,3,4]
+[[1],[1,2],[1,2,3],[1,2,3,4]]
+
+> prefix :: [Music a] -> Music a
+> prefix mel = let m1 = line (concat (prefixes mel))
+>                  m2 = transpose 12 (line (concat (prefixes (reverse mel))))
+>                  m  = instrument Flute m1 :=: instrument VoiceOohs m2
+>              in m :+: transpose 5 m :+: m
+
+Example melodies:
+
+> mel1 = [c 5 en, e 5 sn, g 5 en, b 5 sn, a 5 en, f 5 sn, d 5 en, b 4 sn, c 5 en]
+> mel2 = [c 5 sn, e 5 sn, g 5 sn, b 5 sn, a 5 sn, f 5 sn, d 5 sn, b 4 sn, c 5 sn]
