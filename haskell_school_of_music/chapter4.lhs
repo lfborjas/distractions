@@ -259,6 +259,8 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 > pedal' :: Int -> Music a -> [Dur -> Music a] -> Music a
 > pedal' t pn ms = (times t pn) :+: pedal t pn ms -- start with pedal
 > pedal'2 = pedal' 2
+> intersperse :: Music a -> [Dur -> Music a] -> Music a
+> intersperse (Prim (Note d p)) ms = line [ (note d p) :+: m d | m <- ms ]
 
 > sinfonia15 :: Music Pitch
 > sinfonia15 = let t = (9/16) * (140/120)
@@ -267,10 +269,14 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 > treble = trebl1  :+: (trebl2 :=: trebl3) :+:
 >          trebl4  :+: (trebl5 :=: trebl6) :+:
 >          trebl7  :+: (trebl8 :=: trebl9) :+:
->          trebl10 
+>          trebl10 :+:
+>          (trebl11 :=: trebl12) :+: trebl13 :+:
+>          (trebl14 :=: trebl15)
 > bass   = bas1 :+:
 >          bas2 :+: (bas3 :=: bas4) :+:
->          bas5 :+: (bas6 :=: bas7)
+>          bas5 :+: (bas6 :=: bas7) :+:
+>          bas8 :+:
+>          bas9
 > trebl1 = addDur sn [b 4, fs 4, fs 4,
 >                      g 4, fs 4, fs 4,
 >                      b 4, fs 4, fs 4,
@@ -379,10 +385,68 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 >          d 3 den :+: snr :+: walk sn [d 3, e 3, fs 3] :+: -- bar 22
 >          g 3 den :+: snr :+: walk sn [g 3, fs 3, e 3] :+: -- bar 23
 >          cs 3 den :+: snr :+: walk sn [cs 3, b 2, as 2] -- bar 24
-> -- final stretch: bar 25
-> trebl10 = rest 0
-> bas7    = rest 0
-> bas6    = rest 0
+> -- final stretch: bar 26 may be suffering from insufficient
+> -- silences in the bass line: seems to not wait enough?
+> trebl10 = pedal'2 (cs 4 sn) [d 4, fs 4] :+: -- bar 25
+>           intersperse (d 4 tn) [b 3, fs 4, fs 4] :+:
+>           intersperse (b 4 tn) [fs 4, d 5, d  5] :+: 
+>           (g 5 den) :+: -- bar 26
+>           intersperse (cs 4 tn) [a 3, e 4,  d 4] :+:
+>           intersperse (a  4 tn) [e 4, cs 5, cs 5] :+:
+>           (fs 5 den) :+: -- bar 27
+>           intersperse (b 3 tn)  [g 3, d 4, d 4] :+:
+>           intersperse (g 4 tn)  [d 4, b 4, b 4] :+:
+>           (e 5 (den + sn)) :+: -- bar 28
+>           pedal'2 (fs 4 sn) [g 4, e 5] -- bar 29
+> bas7    = as 3 (dqn + den) :+: -- bar 25
+>           b 3 sn -- bar 26
+> bas6    = (fs 2 den) :+: snr :+:
+>           walk sn [fs 3, e 3, d 3] :+: -- bar 25
+>           b 2 den :+:
+>           intersperse (d 3 tn) [b 2, fs 3, fs 3] :+:
+>           intersperse (b 3 tn) [g 3, e 4, e 4] :+: -- bar 26
+>           a 4 den :+:
+>           intersperse (cs 3 tn) [a 2, e 3, e 3] :+:
+>           intersperse (a  3 tn) [fs 3, d 4, d 4] :+: -- bar 27
+>           intersperse (g  4 tn) [b 4, d 4, d 4] :+:
+>           intersperse (b  3 tn) [d 4, g 3, g 3] :+:
+>           intersperse (e  3 tn) [g 3, cs 3, cs 3] :+: -- bar 28
+>           as 2 (den + sn) :+:
+>           addDur sn [b 2, cs 3, fs 2, b 2, as 2] -- bar 29
+> trebl12 = d 5 (dqn + den + sn) :+: -- bar 30
+>           pedal'2 (b 4 sn) [c 5, g 5] :+: -- bar 31
+>           as 4 den :+: fs 5 (dqn + tn) -- bar 32
+> trebl11 = pedal2 (b 3 sn) [f 4, d 4, f 4] :+: -- bar 30
+>           g 4 (dqn + den) :+: -- bar 31
+>           fs 4 den :+: as 4 dqn -- bar 32
+> trebl13 = addDur tn [b 4, d 5, fs 5, b 5, fs 5] :+:
+>           intersperse (d 5 tn) [fs 5, b 4, b 4] :+:
+>           intersperse (fs 4 tn) [b 4, d 4, d 4] -- bar 33
+> bas8    = b 2 den :+: denr :+: b 2 den :+: -- bar 30
+>           e 3 (dqn + den + den + dqn) :+: -- bars 31-32
+>           d 3 en :+: snr :+: denr :+: denr -- bar 33
+> trebl15 = d 5 (dqn + den + sn) :+:  -- bar 34
+>           pedal'2 (cs 5 sn) [gs 5, d 5] :+: -- bar 35
+>           addDur sn [e 5, cs 5, cs 5] :+:
+>           as 5 sn :+: walk sn [cs 5, d 5, e 5] :+: -- bar 36
+>           addDur sn [fs 5, g 5, e 5] :+:
+>           d 5 den :+: cs 5 en :+: b 4 sn :+: -- bar 36
+>           b 4 dhn -- bar 38, FIN
+> trebl14 = e 4 (dqn + den + dqn + den) :+: -- bars 34-35
+>           as 4 den :+: snr :+:
+>           walk sn [as 4, b 4, ds 5] :+: -- bar 36
+>           b 4 dqn :+: as 4 den :+: -- bar 37
+>           b 4 dhn -- bar 38, FIN
+> bas9    = addDur tn [b 3, g 3, b 3, d 4, g 4, d 4] :+:
+>           intersperse (b 3 tn) [d 4, g 3, g 3] :+:
+>           intersperse (d 3 tn) [g 3, b 2, b 2] :+: -- bar 34
+>           es 2 den :+: denr :+: denr :+: -- bar 35
+>           fs 2 den :+: snr :+:
+>           walk sn [e 3, fs 3, g 3] :+: -- bar 36
+>           d 3 en :+: e 3 sn :+:
+>           fs 3 en :+: e 3 sn :+:
+>           fs 3 en :+: fs 2 sn :+: -- bar 37
+>           b 2 dhn -- bar 38, FIN
 
 
 Another fun tune, perhaps for the presentation:
