@@ -261,6 +261,11 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 > pedal'2 = pedal' 2
 > intersperse :: Music a -> [Dur -> Music a] -> Music a
 > intersperse (Prim (Note d p)) ms = line [ (note d p) :+: m d | m <- ms ]
+> cheapTrill :: Music Pitch -> Music Pitch
+> cheapTrill (Prim (Note d p)) =
+>   note (d/5) p :+: note (d/5) (trans 1 p) :+:
+>   note (d/5) p :+: note (d/5) (trans 1 p) :+:
+>   note (d/5) p
 
 > sinfonia15 :: Music Pitch
 > sinfonia15 = let t = (9/16) * (140/120)
@@ -430,11 +435,12 @@ some auxiliary functions (uses list comprehensions, introduced in the next chapt
 >           addDur sn [e 5, cs 5, cs 5] :+:
 >           as 5 sn :+: walk sn [cs 5, d 5, e 5] :+: -- bar 36
 >           addDur sn [fs 5, g 5, e 5] :+:
->           d 5 den :+: cs 5 en :+: b 4 sn :+: -- bar 36
+>           d 5 den :+: cheapTrill (cs 5 en) :+:
+>           b 4 sn :+: -- bar 37
 >           b 4 dhn -- bar 38, FIN
 > trebl14 = e 4 (dqn + den + dqn + den) :+: -- bars 34-35
 >           as 4 den :+: snr :+:
->           walk sn [as 4, b 4, ds 5] :+: -- bar 36
+>           walk sn [as 4, b 4, cs 5] :+: -- bar 36
 >           b 4 dqn :+: as 4 den :+: -- bar 37
 >           b 4 dhn -- bar 38, FIN
 > bas9    = addDur tn [b 3, g 3, b 3, d 4, g 4, d 4] :+:
