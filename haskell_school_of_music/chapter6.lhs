@@ -476,7 +476,168 @@ Exercise 6.6: define mordent, turn and appogiatura:
 
 > mordent :: Int -> Rational -> Music Pitch -> Music Pitch
 > mordent n r (Prim (Note d p)) =
->   note (r*d/2) p :+:
->   note (r*d/2) (trans n p) :+:
->   note (1-(r*d/2 + r*d/2)) p
-> 
+>   note (f/2) p :+:
+>   note (f/2) (trans n p) :+:
+>   note ((1-r)*d) p
+>   where f = r*d
+> bachMordent,invMordent :: Music Pitch -> Music Pitch
+> bachMordent = mordent 1 (1/8)
+> invMordent  = mordent (-1) (1/8)
+
+Which is a more generalized version of the mordent I'd figured out earlier:
+
+> mordent' :: Int -> Music Pitch -> Music Pitch
+> mordent' n (Prim (Note d p)) =
+>   (note (d/16) p) :+: (note (d/16) (trans n p)) :+: (note (14 * d/16) p)
+
+These are equivalent:
+λ> mordent' 1 $ d 5 qn
+Prim (Note (1 % 64) (D,5)) :+: (Prim (Note (1 % 64) (Ds,5)) :+: Prim (Note (7 % 32) (D,5)))
+
+λ> mordent 1 (1/8) $ d 5 qn
+Prim (Note (1 % 64) (D,5)) :+: (Prim (Note (1 % 64) (Ds,5)) :+: Prim (Note (7 % 32) (D,5)))
+
+Note that in both cases, the duration of the original note is preserved:
+
+λ> dur $ mordent 1 (1/4) $ d 5 qn
+1 % 4
+λ> dur $ mordent' 1 $ d 5 qn
+1 % 4
+
+An appoggiatura is a grace note that takes half of the note's duration,
+and always receives the upbeat:
+
+> appoggiatura :: Int -> Music Pitch -> Music Pitch
+> appoggiatura n = grace n (1/2) 
+
+
+λ> appoggiatura 2 $ d 4 qn
+Prim (Note (1 % 8) (E,4)) :+: Prim (Note (1 % 8) (D,4))
+
+A turn is a short figure consisting of the note above the one indicated, the note itself, the note below the one indicated, and the note itself again. It is marked by a mirrored S-shape lying on its side above the staff.
+
+> turn :: Int -> Music Pitch -> Music Pitch
+> turn n (Prim (Note d p)) =
+>   note ((1-r)*d/2) p :+:
+>   note (f/3) (trans n p) :+:
+>   note (f/3) p :+:
+>   note (f/3) (trans (negate n) p) :+:
+>   note ((1-r)*d/2) p
+>   where r = 1/2
+>         f = r*d
+
+
+λ> dur $ turn 2 $ c 4 dqn
+3 % 8
+λ> dur $ c 4 dqn
+3 % 8
+
+λ> turn 2 $ c 4 dqn
+Prim (Note (3 % 32) (C,4)) :+: (Prim (Note (1 % 16) (D,4)) :+: (Prim (Note (1 % 16) (C,4)) :+: (Prim (Note (1 % 16) (As,3)) :+: Prim (Note (3 % 32) (C,4)))))
+
+6.10 Percussion
+===============
+
+In MIDI, a music pitch doesn't quite make sense for percussion, but there's
+a mapping possible between the name of a percussion instrument
+and its "MIDI key" and its "pitch"; i.e. different notes have different assigned
+instruments (notes that don't will be played by a piano)
+
+`perc` comes in Euterpea
+
+> perc' :: PercussionSound -> Dur -> Music Pitch
+> perc' ps dur = instrument Percussion $
+>                note dur (pitch (fromEnum ps + 35))
+
+`fromEnum` takes a type constructor and gets its position in the list of
+constructors of its type. 
+
+> funkGroove :: Music Pitch
+> funkGroove =
+>   let p1 = perc LowTom qn
+>       p2 = perc AcousticSnare en
+>   in tempo 3 $ cut 8 $ forever
+>      ((p1 :+: qnr :+: p2 :+: qnr :+: p2 :+:
+>        p1 :+: p1 :+: qnr :+: p2 :+: enr)
+>       :=: roll en (perc ClosedHiHat 2))
+
+6.11 and 6.12 A map and fold for music
+======================================
+
+mMap :: (a->b) -> Music a -> Music b
+
+That is, it applies a given function to each pitch in a musical value.
+
+for example:
+
+type Volume = Int
+
+addVolume    :: Volume -> Music Pitch -> Music (Pitch,Volume)
+addVolume v  = mMap (\p -> (p,v))
+
+> vm1, vm2 :: Music (Pitch, Volume)
+> vm1 = addVolume 100 (c 4 qn :+: e 4 qn :+: g 4 qn)
+> vm2 = addVolume 30 (c 4 qn :+: e 4 qn :+: g 4 qn)
+
+More interestingly, we can also define a fold for music:
+
+ mFold ::  (Primitive a -> b) -> (b->b->b) -> (b->b->b) ->
+           (Control -> b -> b) -> Music a -> b
+ mFold f (+:) (=:) g m =
+   let rec = mFold f (+:) (=:) g
+   in case m of
+        Prim p      -> f p
+        m1 :+: m2   -> rec m1 +: rec m2
+        m1 :=: m2   -> rec m1 =: rec m2
+        Modify c m  -> g c (rec m)
+
+Albeit unwieldy, we can use it to define mMap a bit more concisely:
+
+> mMap' :: (a->b) -> Music a -> Music b
+> mMap' f = mFold g (:+:) (:=:) Modify where
+>   g (Note d x) = note d (f x)
+>   g (Rest d)   = rest d
+
+That is, we can redefine what the Prim constructor is, leaving everything else as is.
+
+Another example, `dur`:
+
+> dur'' :: Music a -> Dur
+> dur'' = mFold getDur (+) max modDur where
+>   getDur (Note d _)  = d
+>   getDur (Rest d)    = d
+>   modDur (Tempo r) d = d/r
+>   modDur _ d         = d
+
+Contrast that with:
+
+ dur' :: Music a -> Dur
+ dur' (Prim (Note d _))    = d
+ dur' (Prim (Rest d))      = d
+ dur' (m1 :+: m2)          = dur' m1 + dur' m2
+ dur' (m1 :=: m2)          = dur m1 `max` dur m2 --whichever is longest
+ dur' (Modify (Tempo r) m) = dur m/r -- need to scale by the modifying tempo
+ dur' (Modify _  m)        = dur m -- other modifiers don't have a bearing here.
+
+Exercises: redefine `retro` with `mFold`:
+
+> retrof :: Music a -> Music a
+> retrof = mFold Prim s p Modify where
+>   s m1 m2 = m2 :+: m1
+>   p m1 m2 = let  d1 = dur m1
+>                  d2 = dur m2
+>             in if d1>d2  then m1 :=: (rest (d1-d2) :+: m2)
+>                else (rest (d2-d1) :+: m1) :=: m2
+
+Define a function called inside out that switches the roles of :+: and :=:
+
+> insideOut = mFold Prim (:=:) (:+:) Modify
+
+
+λ> retro $ (c 4 qn :=: c 5 en) :+: e 4 qn :+: g 4 qn :+: a 4 hn
+((Prim (Note (1 % 2) (A,4)) :+: Prim (Note (1 % 4) (G,4))) :+: Prim (Note (1 % 4) (E,4))) :+: (Prim (Note (1 % 4) (C,4)) :=: (Prim (Rest (1 % 8)) :+: Prim (Note (1 % 8) (C,5))))
+λ> retrof $ (c 4 qn :=: c 5 en) :+: e 4 qn :+: g 4 qn :+: a 4 hn
+((Prim (Note (1 % 2) (A,4)) :+: Prim (Note (1 % 4) (G,4))) :+: Prim (Note (1 % 4) (E,4))) :+: (Prim (Note (1 % 4) (C,4)) :=: (Prim (Rest (1 % 8)) :+: Prim (Note (1 % 8) (C,5))))
+λ> insideOut $ (c 4 qn :=: c 5 en) :+: e 4 qn :+: g 4 qn :+: a 4 hn
+(Prim (Note (1 % 4) (C,4)) :+: Prim (Note (1 % 8) (C,5))) :=: (Prim (Note (1 % 4) (E,4)) :=: (Prim (Note (1 % 4) (G,4)) :=: Prim (Note (1 % 2) (A,4))))
+λ> 
