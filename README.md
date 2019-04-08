@@ -97,3 +97,7 @@ A gentle introduction to Racket, using graphics libraries bundled with the langu
 
 Finally exploring the other side of the functional house lured by my love of music. This book explores the Euterpea haskell library as well as the language itself. Came out recently (August 2018): http://euterpea.com/haskell-school-of-music/ (the full text of an earlier, incomplete (due to the untimely death of the original author), version is available at: http://haskell.cs.yale.edu/wp-content/uploads/2015/03/HSoM.pdf)
 
+## Get Programming with Haskell
+
+Ready to get a bit more hands-on experience with Haskell, I shopped around and [GPwH](https://www.manning.com/books/get-programming-with-haskell) seems to be another good "first book" with some practical projects to implement. Definitely less elegant than HSoM, but that does mean it gets to some more practical things faster. Source code for examples and capstone projects is available online (as a zipfile in the manning page). I'm practicing along with the more interesting examples. Same setup as HSoM: install [the haskell platform](https://www.haskell.org/platform/), fire up `haskell-mode` in emacs, `C-c C-l` with `haskell-interactive-mode` enable to compile files and play around in the repl.
+
