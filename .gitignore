@@ -5,8 +5,11 @@
 *.[oa]
 *~
 *#*#
+*\.#*
 *.rbc
 *.out
 # compiled lisp files:
-*.fas
+*.fas*
 *.lib
+*quicklisp*
+
