@@ -1,5 +1,7 @@
 # Haskell School of Music
 
+A [most fantastic book for learning Haskell and computer music](http://euterpea.com/haskell-school-of-music/). Started by Paul Hudak and finished by one of his pupils who herself is now working on a musical/functional legacy. 
+
 ## Setup
 
 Following the instructions in [the Euterpea
